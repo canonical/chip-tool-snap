@@ -1,4 +1,4 @@
-##How to build
+## How to build
 - Install ubunutu 22.04 lxc container in your host dev environment.
 - Install snapcraft 7.x in the container.
 - Ensure that you will have build-essentials installed in this container.
@@ -6,7 +6,7 @@
 - To build the snap use following command at bash prompt inside your container
   ``` snapcraft --destructive-mode ```
 
-##Notes
+## Notes
 - At this moment this will build for x86_64 arch only. For arm64, work is in progress. 
 - You should have at least 35GB of disk space available.
 - Since matter source code is very big, downloading whole source can take considerable amount of time, which affects snap build time.
