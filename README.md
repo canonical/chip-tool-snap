@@ -17,7 +17,7 @@
   - May be you can try simple pairing operation over ethernet by using following command line once the snap is installed,
     - ``` chip-tool pairing ethernet 1 20202021 3840 <ip of device node> 5543 ```
     
-   for server device node you can build and run  linux placeholder device app from matter repo.
+   The above command will start matter controller node for server device node you can build and run  linux placeholder device app from matter repo.
 
 - Finally check out the matter repo for more details. Starting point  can be following      
   [matter-build-guide](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md)
