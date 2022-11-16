@@ -12,8 +12,8 @@
 - Since matter source code is very big, downloading whole source can take considerable amount of time, which affects snap build time.
 - To test this snap
    - Install the snap
-     ``` snap install <snap name> ```
-     ``` snap connect <snap name>:bluez ```
+     - ``` snap install <snap name> ```
+     - ``` snap connect <snap name>:bluez ```
   - May be you can try simple pairing operation over ethernet by using following command line once the snap is installed
     ``` chip-tool pairing ethernet 1 20202021 3840 <ip of device node> 5543 ```
    for server device node you can build and run  linux placeholder device app from matter repo.
