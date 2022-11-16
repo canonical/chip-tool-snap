@@ -1,3 +1,6 @@
+## Purpose 
+This is an attempt to snap out matter chip-tool application, which is a reference implementation of matter controller node application.
+
 ## How to build
 - Install ubunutu 22.04 lxc container in your host dev environment.
 - Install snapcraft 7.x in the container.
