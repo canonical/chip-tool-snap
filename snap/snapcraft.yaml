@@ -17,16 +17,14 @@ assumes:
   - snapd2.46
 parts:
   matter-dev:
-    source: https://github.com/project-chip/connectedhomeip.git #connectedhomeip 
     plugin: nil
-    override-pull: |
-     echo "just do nothing"
-     #ln -sf ${CRAFT_PROJECT_DIR}/connectedhomeip connectedhomeip
     override-build: |
       set +u	
       echo "I am in dir `pwd`"
-      git clone --recurse-submodules https://github.com/project-chip/connectedhomeip.git .
-      git submodule update --init	
+      
+      git clone https://github.com/project-chip/connectedhomeip.git --depth=1 .
+      scripts/checkout_submodules.py --shallow --platform linux
+
       #cp -arfT $CRAFT_PROJECT_DIR/connectedhomeip $CRAFT_PART_BUILD/
      
       #mv $CRAFT_PROJECT_DIR/bakup/*  $CRAFT_PART_BUILD/

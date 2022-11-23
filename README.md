@@ -11,7 +11,7 @@ This is an attempt to snap out matter chip-tool application, which is a referenc
 
 ## Notes
 - At this moment this will build for x86_64 arch only. For arm64, work is in progress. 
-- You should have at least 35GB of disk space available.
+- You should have at least 15GB of disk space available.
 - Since matter source code is very big, downloading whole source can take considerable amount of time, which affects snap build time.
 - To test this snap
    - Install the snap
