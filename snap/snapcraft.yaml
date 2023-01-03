@@ -7,6 +7,8 @@ description: |
 
   The snap packaging makes it easy to run the Chip Tool on Linux distributions.
 
+  For usage instructions, refer to https://github.com/farshidtz/chip-tool-snap/blob/main/README.md
+
 confinement: strict
 grade: devel
 license: Apache-2.0
@@ -79,7 +81,7 @@ apps:
     plugs:
       - network
       - bluez
-      - avahi-control
+      # - avahi-control
       - avahi-observe
     # environment:
     ## This isn't sufficient
