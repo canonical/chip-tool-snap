@@ -1,59 +1,86 @@
 name: chip-tool 
-version: "0.1"
-summary: matter for HA prelim snap
+version: master
+summary: Chip Tool Matter Controller
 description: |
-  Matter repo provides code for matter middleware and there are lot of examples based on operational features for home utilities. This snap tries to provide
-  matter controller(chip-tool).   
+  Chip Tool is a Matter controller being developed as part of the Connected Home IP project:
+  https://github.com/project-chip/connectedhomeip.git
+
+  The snap packaging makes it easy to run the Chip Tool on Linux distributions.
+
 confinement: strict
+grade: devel
+license: Apache-2.0
+
 base: core22
-grade: stable
-license: Apache-2.0 #not sure whether this is right
+
 architectures:
   - build-on: amd64
-    build-for: amd64
   - build-on: arm64
-    build-for: arm64
-assumes:
-  - snapd2.46
+
+layout:
+  /mnt:
+    bind: $SNAP_DATA/mnt
+
 parts:
-  matter-dev:
+  connectedhomeip:
     plugin: nil
-    override-build: |
-      set +u	
-      echo "I am in dir `pwd`"
-      
+    override-pull: |
+      # shallow clone the project its submodules
+      # TODO clone a specific tag or hash
       git clone https://github.com/project-chip/connectedhomeip.git --depth=1 .
       scripts/checkout_submodules.py --shallow --platform linux
+      
+  chip-tool:
+    after: [connectedhomeip]
+    plugin: nil
+    override-build: |
+      mkdir -p $CRAFT_PART_INSTALL/bin
 
-      #cp -arfT $CRAFT_PROJECT_DIR/connectedhomeip $CRAFT_PART_BUILD/
-     
-      #mv $CRAFT_PROJECT_DIR/bakup/*  $CRAFT_PART_BUILD/
-      source scripts/activate.sh
+      cd ../../connectedhomeip/src
+      
+      # The project writes its data to /tmp. Snap does not allow bind mounting
+      #   a persistent directory on /tmp, so we need to replace it in the code.
+      # Replace all /tmp directories with /mnt:
+      sed -i 's/\/tmp/\/mnt/g' src/platform/Linux/CHIPLinuxStorage.h
+      sed -i 's/\/tmp/\/mnt/g' src/platform/Linux/CHIPPlatformConfig.h
 
-      gn gen out/host1
+      # Setup the build environment
+      set +u # do not treat unset variables as error
+      # source scripts/activate.sh
 
-      ninja -C out/host1
-      cp -ar out/host1/chip-* $CRAFT_PART_INSTALL/
-      cp out/host1/spake2p  $CRAFT_PART_INSTALL/
-      cp out/host1/address-resolve-tool $CRAFT_PART_INSTALL/
-      cp out/host1/obj/src/qrcodetool/bin/qrcodetool $CRAFT_PART_INSTALL/  
-      cp -ar out/host1/lib    $CRAFT_PART_INSTALL/
-    build-packages: [git, gcc, g++, pkg-config, libssl-dev, libdbus-1-dev, libglib2.0-dev, libavahi-client-dev, ninja-build, python3-venv, python3-dev, python3-pip, unzip, libgirepository1.0-dev, libcairo2-dev, libreadline-dev, generate-ninja]
-    #override-prime:
-    #  rm -r $CRAFT_PART_INSTALL
-    stage:
-      - -tests
-      - -gen
-      - -protocol_buffer
-      - -python
-      - -python-venv
-      - -*.ninja
-      - -*.map 
-    organize:
-      chip-tool: bin/chip-tool  
+      # build the chip tool
+      ./scripts/examples/gn_build_example.sh examples/chip-tool ./build-examples
+      # ./scripts/build/build_examples.py --target linux-x64-chip-tool build
+      
+      cp build-examples/chip-tool $CRAFT_PART_INSTALL/bin/
+      # cp out/linux-*-chip-tool $CRAFT_PART_INSTALL/bin/chip-tool
+    build-packages:
+      - git
+      - gcc
+      - g++
+      - pkg-config
+      - libssl-dev
+      - libdbus-1-dev
+      - libglib2.0-dev
+      - libavahi-client-dev
+      - ninja-build
+      - python3-venv
+      - python3-dev
+      - python3-pip
+      - unzip
+      - libgirepository1.0-dev
+      - libcairo2-dev
+      - libreadline-dev
+      - generate-ninja
+
 apps:
   chip-tool:
     command: bin/chip-tool
     plugs:
       - network
       - bluez
+      - avahi-control
+      - avahi-observe
+    # environment:
+    ## This isn't sufficient
+    #   TMPDIR: "/mnt"
