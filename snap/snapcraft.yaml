@@ -1,14 +1,6 @@
 name: chip-tool 
 summary: Chip Tool Matter Controller
-description: |
-  Chip Tool is a Matter controller being developed as part of the Connected Home IP project:
-  https://github.com/project-chip/connectedhomeip.git
-
-  The snap packaging makes it easy to run the Chip Tool on Linux distributions.
-
-  For usage instructions, refer to https://github.com/farshidtz/chip-tool-snap
-
-  To report snap-related issues, visit https://github.com/farshidtz/chip-tool-snap/issues
+description: Refer to https://snapcraft.io/chip-tool
 adopt-info: connectedhomeip
 
 confinement: strict
