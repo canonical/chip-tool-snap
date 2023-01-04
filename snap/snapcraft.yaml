@@ -1,5 +1,4 @@
 name: chip-tool 
-version: master
 summary: Chip Tool Matter Controller
 description: |
   Chip Tool is a Matter controller being developed as part of the Connected Home IP project:
@@ -10,6 +9,7 @@ description: |
   For usage instructions, refer to https://github.com/farshidtz/chip-tool-snap
 
   To report snap-related issues, visit https://github.com/farshidtz/chip-tool-snap/issues
+adopt-info: connectedhomeip
 
 confinement: strict
 grade: devel
@@ -28,11 +28,15 @@ layout:
 parts:
   connectedhomeip:
     plugin: nil
+    build-environment:
+      - TAG: v1.0.0.2
     override-pull: |
       # shallow clone the project its submodules
-      # TODO clone a specific tag or hash
-      git clone https://github.com/project-chip/connectedhomeip.git --depth=1 .
+      git clone https://github.com/project-chip/connectedhomeip.git --depth=1 --branch=$TAG .
       scripts/checkout_submodules.py --shallow --platform linux
+      
+      # set the snap version
+      craftctl set version=$TAG+snap
       
   chip-tool:
     after: [connectedhomeip]
