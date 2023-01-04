@@ -1,4 +1,5 @@
 # Chip Tool Snap
+[![chip-tool](https://snapcraft.io/chip-tool/badge.svg)](https://snapcraft.io/chip-tool)
 
 Chip Tool is a Matter controller being developed as part of the [Connected Home IP project](https://github.com/project-chip/connectedhomeip.git).
 
@@ -11,7 +12,7 @@ This snap has been tested on amd64 and arm64 architecture for WiFi/Ethernet/DNS-
 ### Setup
 
 ```bash
-sudo snap install chip-tool --edge
+sudo snap install chip-tool
 ```
 
 Connect the [`avahi-observe`](https://snapcraft.io/docs/avahi-observe-interface) interface to allow DNS-SD based discovery:
