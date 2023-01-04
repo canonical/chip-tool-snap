@@ -11,12 +11,12 @@ This snap has been tested on amd64 and arm64 architecture for WiFi/Ethernet/DNS-
 ### Setup
 
 ```bash
-snap install chip-tool --edge
+sudo snap install chip-tool --edge
 ```
 
 Connect the [`avahi-observe`](https://snapcraft.io/docs/avahi-observe-interface) interface to allow DNS-SD based discovery:
 ```bash
-snap connect chip-tool:avahi-observe
+sudo snap connect chip-tool:avahi-observe
 ```
 
 ### Commissioning
@@ -32,11 +32,11 @@ sudo chip-tool pairing ethernet 110 20202021 3840 192.168.1.110 5543
 
 where:
 
--   `110` is the assigned node id
--   `20202021` is the pin code for the bridge app
+-   `110` is the node id being assigned to the app
+-   `20202021` is the pin code set on the app
 -   `3840` is the discriminator id
--   `192.168.1.111` is the IP address of the host for the bridge
--   `5540` the the port for the bridge
+-   `192.168.1.110` is the IP address of the device running the app
+-   `5540` the port for server that runs inside the app
 
 
 ### Control
@@ -48,10 +48,8 @@ sudo chip-tool onoff toggle 110 1
 where:
 
 -   `onoff` is the matter cluster name
--   `on`/`off`/`toggle` is the command name. The `toggle` command is RECOMMENDED
-    because it is stateless. The bridge does not synchronize the actual state of
-    devices.
--   `110` is the node id of the bridge app assigned during the commissioning
+-   `on`/`off`/`toggle` is the command name.
+-   `110` is the node id of the app assigned during the commissioning
 -   `1` is the endpoint of the configured device
 
 

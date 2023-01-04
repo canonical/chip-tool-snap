@@ -7,7 +7,9 @@ description: |
 
   The snap packaging makes it easy to run the Chip Tool on Linux distributions.
 
-  For usage instructions, refer to https://github.com/farshidtz/chip-tool-snap/blob/main/README.md
+  For usage instructions, refer to https://github.com/farshidtz/chip-tool-snap
+
+  To report snap-related issues, visit https://github.com/farshidtz/chip-tool-snap/issues
 
 confinement: strict
 grade: devel
