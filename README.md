@@ -5,7 +5,7 @@ Chip Tool is a Matter controller being developed as part of the [Connected Home 
 
 The snap packaging makes it easy to run the Chip Tool on Linux distributions.
 
-This snap has been tested on amd64 and arm64 architecture for WiFi/Ethernet/DNS-SD commissioning and control. BLE and Thread has not been tested.
+This snap has been tested on amd64/arm64 architectures for WiFi/Ethernet/DNS-SD/BLE commissioning and control. It has not been tested with the Thread protocol.
 
 ## Usage
 
@@ -18,6 +18,11 @@ sudo snap install chip-tool
 Connect the [`avahi-observe`](https://snapcraft.io/docs/avahi-observe-interface) interface to allow DNS-SD based discovery:
 ```bash
 sudo snap connect chip-tool:avahi-observe
+```
+
+Connect the [`bluez`](https://snapcraft.io/docs/bluez-interface) interface for device discovery over Bluetooth Low Energy (BLE):
+```bash
+sudo snap connect chip-tool:bluez
 ```
 
 ### Commissioning
