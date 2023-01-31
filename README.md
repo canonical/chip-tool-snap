@@ -5,7 +5,7 @@ Chip Tool is a Matter controller being developed as part of the [Connected Home 
 
 The snap packaging makes it easy to run the Chip Tool on Linux distributions.
 
-This snap has been tested on amd64/arm64 architectures for WiFi/Ethernet/DNS-SD/BLE commissioning and control. It has not been tested with the Thread protocol.
+This snap has been tested on amd64/arm64 architectures for WiFi/Ethernet/DNS-SD/BLE/Thread commissioning and control.
 
 ## Usage
 
@@ -25,8 +25,8 @@ Connect the [`bluez`](https://snapcraft.io/docs/bluez-interface) interface for d
 sudo snap connect chip-tool:bluez
 ```
 
-### Commissioning
-Discover and pair:
+### Commissioning into IP network
+Discover using DNS-SD and pair:
 ```bash
 sudo chip-tool pairing onnetwork 110 20202021
 ```
@@ -43,6 +43,25 @@ where:
 -   `3840` is the discriminator id
 -   `192.168.1.110` is the IP address of the device running the app
 -   `5540` the port for server that runs inside the app
+
+### Commissioning into Thread network over BLE
+Obtain Thread network credential:
+```bash
+$ sudo ot-ctl dataset active -x
+0e08...f7f8
+Done
+```
+Discover and pair:
+```bash
+sudo chip-tool pairing ble-thread 110 hex:0e08...f7f8 20202021 3840
+```
+
+where:
+
+-   `110` is the node id being assigned to the app
+-   `0e08...f7f8` is the Thread network credential operational dataset, truncated for readability.
+-   `20202021` is the pin code set on the app
+-   `3840` is the discriminator id
 
 
 ### Control
