@@ -31,18 +31,10 @@ Discover using DNS-SD and pair:
 sudo chip-tool pairing onnetwork 110 20202021
 ```
 
-Or, pair directly by giving the IP address:
-```bash
-sudo chip-tool pairing ethernet 110 20202021 3840 192.168.1.110 5543
-```
-
 where:
 
 -   `110` is the node id being assigned to the app
 -   `20202021` is the pin code set on the app
--   `3840` is the discriminator id
--   `192.168.1.110` is the IP address of the device running the app
--   `5540` the port for server that runs inside the app
 
 ### Commissioning into Thread network over BLE
 Obtain Thread network credential:
