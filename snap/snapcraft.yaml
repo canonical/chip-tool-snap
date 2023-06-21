@@ -4,7 +4,7 @@ description: Refer to https://snapcraft.io/chip-tool
 adopt-info: connectedhomeip
 
 confinement: strict
-grade: devel
+grade: stable
 license: Apache-2.0
 
 base: core22
