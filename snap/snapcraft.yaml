@@ -30,10 +30,45 @@ parts:
       # set the snap version
       craftctl set version=$TAG+snap
       
-  chip-tool:
-    after: [connectedhomeip]
+  zap:
     plugin: nil
+    source: https://github.com/project-chip/zap.git
+    source-depth: 1
+    source-tag: v2023.05.04
+    build-environment:
+      - NODE_VERSION: v18.16.1
+    build-packages:
+      - build-essential 
+      - libpango1.0-dev 
+      - libjpeg-dev 
+      - libgif-dev 
+      - librsvg2-dev
+      - wget
     override-build: |
+      if [[ $SNAP_ARCH == "arm64" ]]; then
+        # Install node+npm
+        NODE=node-$NODE_VERSION-linux-$SNAP_ARCH
+        wget https://nodejs.org/dist/$NODE_VERSION/$NODE.tar.xz
+        tar -xJf $NODE.tar.xz
+        export PATH=$PWD/$NODE/bin:$PATH
+
+        # Install zap
+        npm install
+        
+        # Define the environment needed for the app build
+        echo "export PATH=$PWD/$NODE/bin:$PATH" > env
+        echo "export ZAP_DEVELOPMENT_PATH=$PWD" >> env
+        cat env
+      fi
+      
+  chip-tool:
+    after: [connectedhomeip, zap]
+    plugin: nil
+    build-environment:
+      - ZAP_ENV: /root/parts/zap/build/env
+    override-build: |
+      # Setup ZAP paths; installed in the corresponding part
+      test -f $ZAP_ENV && source $ZAP_ENV
       mkdir -p $CRAFT_PART_INSTALL/bin
 
       cd ../../connectedhomeip/src
