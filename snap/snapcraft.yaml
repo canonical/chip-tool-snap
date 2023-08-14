@@ -94,14 +94,8 @@ parts:
       # To avoid activation errors, don't treat unset variables as error
       set +u 
 
-      # Installing gevent (from esp32 requirements) fails with Python 3.10
-      # See: https://github.com/project-chip/connectedhomeip/issues/28435
-      #
-      # The latest bootstrap script accepts a --platform flag which makes it
-      #   possible to skip unneeded platform packages.
-      #
-      # For v1.1.0.1, we'll skip the problematic package manually:
-      sed -i '/^gdbgui/ s/./#&/' ./scripts/setup/requirements.esp32.txt
+      # Skip all non-core Python requirements:
+      sed -i '/^-r requirements/ s/./#&/' ./scripts/setup/requirements.txt
 
       # Build the chip tool
       ./scripts/examples/gn_build_example.sh examples/chip-tool ./build-examples
