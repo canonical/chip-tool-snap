@@ -69,6 +69,7 @@ parts:
     override-build: |
       # Setup ZAP paths; installed in the corresponding part
       test -f $ZAP_ENV && source $ZAP_ENV
+
       mkdir -p $CRAFT_PART_INSTALL/bin
 
       cd ../../connectedhomeip/src
@@ -90,10 +91,13 @@ parts:
       # Replace key-value store path:
       sed -i 's/\/tmp/\/mnt/g' src/platform/Linux/CHIPPlatformConfig.h
 
-      # to avoid activation errors, don't treat unset variables as error
+      # To avoid activation errors, don't treat unset variables as error
       set +u 
 
-      # build the chip tool
+      # Skip all non-core Python requirements:
+      sed -i '/^-r requirements/ s/./#&/' ./scripts/setup/requirements.txt
+
+      # Build the chip tool
       ./scripts/examples/gn_build_example.sh examples/chip-tool ./build-examples
       
       cp build-examples/chip-tool $CRAFT_PART_INSTALL/bin/
