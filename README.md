@@ -9,6 +9,12 @@ This snap has been tested on amd64/arm64 architectures for WiFi/Ethernet/DNS-SD/
 
 ## Usage
 
+### Dependencies
+For DNS-SD and BLE discovery, install `avahi-daemon` and `bluez`:
+```bash
+sudo apt install avahi-daemon bluez
+```
+
 ### Setup
 
 ```bash
