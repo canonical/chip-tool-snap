@@ -127,6 +127,7 @@ apps:
       - network
       - bluez
       - avahi-observe
+      - process-control
     environment:
       # Replace the path for chip-tool configuration files
       TMPDIR: "/mnt"
