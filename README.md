@@ -25,6 +25,18 @@ Connect the [`bluez`](https://snapcraft.io/docs/bluez-interface) interface for d
 sudo snap connect chip-tool:bluez
 ```
 
+> **Note**  
+> On **Ubuntu Core**, the `avahi-control` and `bluez` interfaces are not provided by the system.
+>
+> These interfaces are provided by other snaps, such as the [Avahi](https://snapcraft.io/avahi) and [BlueZ](https://snapcraft.io/bluez) snaps.
+> To install the snaps and connect to the interfaces, run:
+> ```bash
+> sudo snap install avahi bluez
+> sudo snap connect chip-tool:avahi-observe avahi:avahi-observe
+> sudo snap connect chip-tool:bluez bluez:service
+> ```
+> 
+
 ### Commissioning into IP network
 Discover using DNS-SD and pair:
 ```bash
