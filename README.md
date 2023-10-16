@@ -25,8 +25,7 @@ Connect the [`bluez`](https://snapcraft.io/docs/bluez-interface) interface for d
 sudo snap connect chip-tool:bluez
 ```
 
-Connect the [`process-control`](https://snapcraft.io/docs/process-control-interface) interface for system-wide process management, 
-such as allow [sched_setattr](https://man7.org/linux/man-pages/man2/sched_setattr.2.html) system call:
+Connect the [`process-control`](https://snapcraft.io/docs/process-control-interface) interface for system-wide process management. This is needed to grant Chip Tool access to make [sched_setattr](https://man7.org/linux/man-pages/man2/sched_setattr.2.html) system calls. This may improve the reliability of the operations (see #8).
 ```bash
 sudo snap connect chip-tool:process-control
 ```
