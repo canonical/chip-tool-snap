@@ -125,6 +125,7 @@ apps:
     command: bin/chip-tool
     plugs:
       - network
+      - network-bind
       - bluez
       - avahi-observe
       - process-control
