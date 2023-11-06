@@ -52,7 +52,7 @@ parts:
     after: [connectedhomeip, zap]
     plugin: nil
     build-environment:
-      - ZAP_ENV: /root/parts/zap/build/env
+      - ZAP_ENV: ../../zap/build/env
     override-build: |
       # Setup ZAP paths; installed in the corresponding part
       test -f $ZAP_ENV && source $ZAP_ENV
