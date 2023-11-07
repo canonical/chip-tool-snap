@@ -44,8 +44,7 @@ parts:
         unzip -o zap-linux-$SNAP_ARCH.zip
 
         # Define the environment needed for the app build
-        echo "CRAFT_PART_BUILD=$CRAFT_PART_BUILD"
-        echo "export ZAP_INSTALL_PATH=$CRAFT_PART_BUILD" >> env
+        echo "export ZAP_INSTALL_PATH=$PWD" >> env
       fi
       
   chip-tool:
