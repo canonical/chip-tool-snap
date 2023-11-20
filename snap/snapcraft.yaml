@@ -21,7 +21,7 @@ parts:
   connectedhomeip:
     plugin: nil
     build-environment:
-      - TAG: v1.1.0.1
+      - TAG: v1.2.0.1
     override-pull: |
       # shallow clone the project its submodules
       git clone https://github.com/project-chip/connectedhomeip.git --depth=1 --branch=$TAG .
@@ -33,7 +33,7 @@ parts:
   zap:
     plugin: nil
     build-environment:
-      - ZAP_VERSION: v2023.09.28
+      - ZAP_VERSION: v2023.11.13
     build-packages:
       - wget
       - unzip
@@ -81,7 +81,7 @@ parts:
       set +u 
 
       # Skip all non-core Python requirements:
-      sed -i '/^-r requirements/ s/./#&/' ./scripts/setup/requirements.txt
+      sed -i '/^-r requirements/ s/./#&/' ./scripts/setup/requirements.all.txt
 
       # Build the chip tool
       ./scripts/examples/gn_build_example.sh examples/chip-tool ./build-examples
