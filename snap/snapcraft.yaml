@@ -80,8 +80,8 @@ parts:
       # To avoid activation errors, don't treat unset variables as error
       set +u 
 
-      # Install only the core Python requirements
-      source ./scripts/setup/bootstrap.sh -p build
+      # Bootstrap with minimal "build" requirements
+      source ./scripts/setup/bootstrap.sh --platform build
 
       # Build the chip tool
       ./scripts/examples/gn_build_example.sh examples/chip-tool ./build-examples
