@@ -1,0 +1,28 @@
+name: Snap Builder
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      # Checkout the code
+      - uses: actions/checkout@v4
+
+      # Build the snap
+      - uses: snapcore/action-build@v1
+        id: build
+
+      # Upload the built artifact
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.build.outputs.snap }}
+          path: ${{ steps.build.outputs.snap }}
+
