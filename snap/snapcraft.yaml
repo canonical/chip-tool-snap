@@ -2,6 +2,7 @@ name: chip-tool
 summary: Chip Tool Matter Controller
 description: Refer to https://snapcraft.io/chip-tool
 adopt-info: connectedhomeip
+version: "v1.2.0.1+snap"
 
 confinement: strict
 grade: stable
@@ -20,12 +21,12 @@ layout:
 parts:
   chip-tool:
     plugin: matter
-    matter-branch: v1.2.0.1
-    zap-version: v2023.11.13
+    # matter-branch: v1.2.0.1 
+    # zap-version: 1
+         
     override-build: |
-      mkdir -p $CRAFT_PART_INSTALL/bin
-
-      cd ../../connectedhomeip/src
+      craftctl default
+      cd $CRAFT_PART_BUILD/matter
       
       # The project writes its data to /tmp which isn't persisted.
       #
@@ -53,24 +54,8 @@ parts:
       # Build the chip tool
       ./scripts/examples/gn_build_example.sh examples/chip-tool ./build-examples
       
+      mkdir -p $CRAFT_PART_INSTALL/bin
       cp build-examples/chip-tool $CRAFT_PART_INSTALL/bin/
-    build-packages:
-      - git
-      - gcc
-      - g++
-      - pkg-config
-      - libssl-dev
-      - libdbus-1-dev
-      - libglib2.0-dev
-      - libavahi-client-dev
-      - ninja-build
-      - python3-venv
-      - python3-dev
-      - python3-pip
-      - libgirepository1.0-dev
-      - libcairo2-dev
-      - libreadline-dev
-      - generate-ninja
 
 apps:
   chip-tool:
