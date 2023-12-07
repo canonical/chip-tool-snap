@@ -13,16 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      # Checkout the code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Build the snap
       - name: Build snap
         uses: snapcore/action-build@v1
         id: build
 
-      # Upload the built artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
