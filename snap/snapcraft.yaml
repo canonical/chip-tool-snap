@@ -21,7 +21,7 @@ parts:
   connectedhomeip:
     plugin: nil
     build-environment:
-      - TAG: v1.2.0.1
+      - TAG: master
     override-pull: |
       # shallow clone the project its submodules
       git clone https://github.com/project-chip/connectedhomeip.git --depth=1 --branch=$TAG .
