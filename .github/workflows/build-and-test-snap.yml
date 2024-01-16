@@ -25,4 +25,14 @@ jobs:
         with:
           name: ${{ steps.build.outputs.snap }}
           path: ${{ steps.build.outputs.snap }}
+          
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download and test snap
+        uses: canonical/matter-snap-testing/test@main
+        with:
+          name: chip-tool
+          snap: ${{needs.build.outputs.snap}}
 
