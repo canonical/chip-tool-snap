@@ -21,7 +21,7 @@ jobs:
         id: build
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.build.outputs.snap }}
           path: ${{ steps.build.outputs.snap }}
