@@ -2,6 +2,7 @@ name: chip-tool
 summary: Chip Tool Matter Controller
 description: Refer to https://snapcraft.io/chip-tool
 adopt-info: connectedhomeip
+version: "master+snap"
 
 confinement: strict
 grade: stable
@@ -18,13 +19,16 @@ layout:
     bind: $SNAP_COMMON/mnt
 
 parts:
-  chip-tool:
+  matter-sdk:
     plugin: matter
     matter-sdk-version: "master"
     matter-zap-version: "v2023.11.13"
+
+  chip-tool:
+    plugin: nil
+    after: [matter-sdk]
     override-build: |
-      craftctl default
-      cd $CRAFT_PART_BUILD/matter
+      cd ../../matter-sdk/build/matter
       
       # Build the chip tool
       ./scripts/examples/gn_build_example.sh examples/chip-tool ./build-examples
