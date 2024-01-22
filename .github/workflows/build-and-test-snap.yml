@@ -1,4 +1,4 @@
-name: Snap Builder
+name: Snap Tester
 
 on:
   push:
@@ -30,9 +30,36 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Download and test snap
-        uses: canonical/matter-snap-testing/test@main
-        with:
-          name: chip-tool
-          snap: ${{needs.build.outputs.snap}}
 
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+      
+      - name: Download locally built snap
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{needs.build.outputs.snap}}
+
+      - name: Run tests
+        shell: bash
+        working-directory: tests
+        env:
+          SKIP_TEARDOWN_REMOVAL: true
+          LOCAL_SERVICE_SNAP: ../${{needs.build.outputs.snap}}
+        run: |
+          go test -failfast -p 1 -timeout 30m -v
+
+      # # Print error logs from snap(s)
+      # - if: failure()
+      #   shell: bash
+      #   working-directory: ${{github.workspace}}/src/test
+      #   run: ./print-errors.sh ${{inputs.name}}
+          
+      - name: Upload snap logs
+        if: always() 
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs
+          path: tests/*.log
+          retention-days: 30
