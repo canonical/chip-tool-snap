@@ -1,0 +1,1 @@
+tests/bin/chip-all-clusters-minimal-app-* filter=lfs diff=lfs merge=lfs -text
