@@ -10,6 +10,8 @@ on:
 
 jobs:
   build:
+    outputs:
+      snap: ${{ steps.snapcraft.outputs.snap }}
     runs-on: ubuntu-latest
     steps:
 
@@ -18,13 +20,14 @@ jobs:
 
       - name: Build snap
         uses: snapcore/action-build@v1
-        id: build
+        id: snapcraft
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.build.outputs.snap }}
-          path: ${{ steps.build.outputs.snap }}
+          name: ${{ steps.snapcraft.outputs.snap }}
+          path: ${{ steps.snapcraft.outputs.snap }}
+          if-no-files-found: error
           
   test:
     needs: build
@@ -39,14 +42,14 @@ jobs:
       - name: Download locally built snap
         uses: actions/download-artifact@v4
         with:
-          name: ${{needs.build.outputs.snap}}
+          name: ${{ needs.build.outputs.snap }}
 
       - name: Run tests
         shell: bash
         working-directory: tests
         env:
           SKIP_TEARDOWN_REMOVAL: true
-          LOCAL_SERVICE_SNAP: ../${{needs.build.outputs.snap}}
+          LOCAL_SERVICE_SNAP: ../${{ needs.build.outputs.snap }}
         run: |
           go test -failfast -p 1 -timeout 30m -v
 
@@ -62,4 +65,3 @@ jobs:
         with:
           name: logs
           path: tests/*.log
-          retention-days: 30
