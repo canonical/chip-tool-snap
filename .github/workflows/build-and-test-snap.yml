@@ -44,6 +44,11 @@ jobs:
         with:
           name: ${{ needs.build.outputs.snap }}
 
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 'stable'
+
       - name: Run tests
         shell: bash
         working-directory: tests
