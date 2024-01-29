@@ -1,8 +1,8 @@
+github.com/canonical/matter-snap-testing v1.0.0-beta h1:wEVJduO9Crz8gfp/SzGL9OkAmJmNahC3yQ/2o7s9J5c=
+github.com/canonical/matter-snap-testing v1.0.0-beta/go.mod h1:Ku1D0Dl99nWbxK/CGPfjOSBmIZ09NqkO14p1gjwTg5o=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/farshidtz/matter-snap-testing v0.0.0-20240122134356-4b20ea079b75 h1:s43euvL/e5duGAFn1KPpJhtKJThqxuI+urwiNweKLr4=
-github.com/farshidtz/matter-snap-testing v0.0.0-20240122134356-4b20ea079b75/go.mod h1:eHkXVimGaHtZz8q820urIXFZUlVHDFiOyw+NtiGUZac=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
