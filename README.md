@@ -98,3 +98,7 @@ Build remotely for all supported architectures:
 ```
 snapcraft remote-build
 ```
+
+## Test
+
+Refer to [tests](./tests).
