@@ -54,12 +54,17 @@ where:
 -   `20202021` is the pin code set on the app
 
 ### Commissioning into Thread network over BLE
-Obtain Thread network credential:
+This depends on an OpenThread Border Router (OTBR) with an active network.
+For guidance on setting that up using the [OTBR snap](https://snapcraft.io/openthread-border-router), refer to [this tutorial](https://github.com/canonical/openthread-border-router-snap/wiki/Commission-and-control-a-Matter-Thread-device-via-the-OTBR-Snap).
+
+Use the [OpenThread CLI](https://openthread.io/reference/cli) to obtain Thread network credential:
 ```bash
 $ sudo ot-ctl dataset active -x
 0e08...f7f8
 Done
 ```
+
+
 Discover and pair:
 ```bash
 sudo chip-tool pairing ble-thread 110 hex:0e08...f7f8 20202021 3840
