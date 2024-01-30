@@ -64,7 +64,6 @@ $ sudo ot-ctl dataset active -x
 Done
 ```
 
-
 Discover and pair:
 ```bash
 sudo chip-tool pairing ble-thread 110 hex:0e08...f7f8 20202021 3840
