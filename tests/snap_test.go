@@ -30,6 +30,9 @@ func TestAllClustersApp(t *testing.T) {
 		allClustersAppLog = "chip-all-clusters-minimal-app.log"
 	)
 
+	// clean
+	utils.Exec(t, "rm -fr /tmp/chip_*")
+
 	logFile, err := os.Create(allClustersAppLog)
 	if err != nil {
 		t.Fatalf("Error creating log file: %s", err)
@@ -53,9 +56,6 @@ func TestAllClustersApp(t *testing.T) {
 	t.Cleanup(func() {
 		utils.Exec(t, "rm /tmp/chip_*")
 	})
-
-	// t.Log("Sleep")
-	// time.Sleep(2 * time.Minute)
 
 	t.Run("Commission", func(t *testing.T) {
 		utils.ExecVerbose(t, "sudo chip-tool pairing onnetwork 110 20202021")
@@ -105,21 +105,21 @@ func setup() (teardown func(), err error) {
 	return
 }
 
-func waitForLogMessage(t *testing.T, appLogPath, expectedLog string, since time.Time) {
+func waitForLogMessage(t *testing.T, logPath, expectedMsg string, since time.Time) {
 	const maxRetry = 10
 
 	for i := 1; i <= maxRetry; i++ {
 		time.Sleep(1 * time.Second)
-		t.Logf("Retry %d/%d: Waiting log message: '%s'", i, maxRetry, expectedLog)
+		t.Logf("Retry %d/%d: Waiting log message: '%s'", i, maxRetry, expectedMsg)
 
-		logs, err := os.ReadFile(appLogPath)
+		logs, err := os.ReadFile(logPath)
 		if err != nil {
 			t.Fatalf("Error reading log file: %s\n", err)
 			continue
 		}
 
-		if strings.Contains(string(logs), expectedLog) {
-			t.Logf("Found expected log message: '%s'", expectedLog)
+		if strings.Contains(string(logs), expectedMsg) {
+			t.Logf("Found expected log message: '%s'", expectedMsg)
 			return
 		}
 	}
