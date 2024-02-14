@@ -10,6 +10,12 @@ import (
 	"time"
 
 	"github.com/canonical/matter-snap-testing/utils"
+	"github.com/stretchr/testify/assert"
+)
+
+const (
+	allClustersAppBin = "bin/chip-all-clusters-minimal-app-commit-1536ca2"
+	allClustersAppLog = "chip-all-clusters-minimal-app.log"
 )
 
 func TestMain(m *testing.M) {
@@ -25,44 +31,25 @@ func TestMain(m *testing.M) {
 }
 
 func TestAllClustersApp(t *testing.T) {
-	const (
-		allClustersAppBin = "bin/chip-all-clusters-minimal-app-commit-1536ca2"
-		allClustersAppLog = "chip-all-clusters-minimal-app.log"
-	)
-
-	// clean
-	utils.Exec(t, "rm -fr /tmp/chip_*")
-
-	logFile, err := os.Create(allClustersAppLog)
-	if err != nil {
-		t.Fatalf("Error creating log file: %s", err)
-	}
-
-	ctx, cancel := context.WithCancel(context.Background())
-	t.Cleanup(cancel)
-
-	cmd := exec.CommandContext(ctx, allClustersAppBin)
-	cmd.Stdout = logFile
-	cmd.Stderr = logFile
-
 	start := time.Now()
-	if err := cmd.Start(); err != nil {
-		t.Fatalf("Error starting application: %s", err)
-	}
+	startAllClustersApp(t)
 
+	// wait for startup
 	waitForLogMessage(t,
 		allClustersAppLog, "CHIP minimal mDNS started advertising", start)
 
-	t.Cleanup(func() {
-		utils.Exec(t, "rm /tmp/chip_*")
-	})
-
 	t.Run("Commission", func(t *testing.T) {
-		utils.ExecVerbose(t, "sudo chip-tool pairing onnetwork 110 20202021")
+		stdout, _, _ := utils.Exec(t, "sudo chip-tool pairing onnetwork 110 20202021 2>&1")
+		assert.NoError(t,
+			os.WriteFile("chip-tool-pairing.log", []byte(stdout), 0644),
+		)
 	})
 
 	t.Run("Control", func(t *testing.T) {
-		utils.ExecVerbose(t, "sudo chip-tool onoff toggle 110 1")
+		stdout, _, _ := utils.Exec(t, "sudo chip-tool onoff toggle 110 1 2>&1")
+		assert.NoError(t,
+			os.WriteFile("chip-tool-onoff.log", []byte(stdout), 0644),
+		)
 
 		waitForLogMessage(t,
 			allClustersAppLog, "CHIP:ZCL: Toggle ep1 on/off", start)
@@ -105,12 +92,37 @@ func setup() (teardown func(), err error) {
 	return
 }
 
+func startAllClustersApp(t *testing.T) {
+	// remove existing temp files
+	utils.Exec(t, "rm -fr /tmp/chip_*")
+
+	logFile, err := os.Create(allClustersAppLog)
+	if err != nil {
+		t.Fatalf("Error creating log file: %s", err)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+
+	cmd := exec.CommandContext(ctx, allClustersAppBin)
+	cmd.Stdout = logFile
+	cmd.Stderr = logFile
+
+	if err := cmd.Start(); err != nil {
+		t.Fatalf("Error starting application: %s", err)
+	}
+
+	t.Cleanup(func() {
+		utils.Exec(t, "rm -f /tmp/chip_*")
+	})
+}
+
 func waitForLogMessage(t *testing.T, logPath, expectedMsg string, since time.Time) {
 	const maxRetry = 10
 
 	for i := 1; i <= maxRetry; i++ {
 		time.Sleep(1 * time.Second)
-		t.Logf("Retry %d/%d: Waiting log message: '%s'", i, maxRetry, expectedMsg)
+		t.Logf("Retry %d/%d: Find log message: '%s'", i, maxRetry, expectedMsg)
 
 		logs, err := os.ReadFile(logPath)
 		if err != nil {
@@ -119,7 +131,7 @@ func waitForLogMessage(t *testing.T, logPath, expectedMsg string, since time.Tim
 		}
 
 		if strings.Contains(string(logs), expectedMsg) {
-			t.Logf("Found expected log message: '%s'", expectedMsg)
+			t.Logf("Found log message: '%s'", expectedMsg)
 			return
 		}
 	}
