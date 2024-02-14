@@ -12,4 +12,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/canonical/matter-snap-testing => ../../matter-snap-testing
+// replace github.com/canonical/matter-snap-testing => ../../matter-snap-testing
+replace github.com/canonical/matter-snap-testing => github.com/canonical/matter-snap-testing v1.0.0-beta.0.20240214075704-937ea6e8495e
