@@ -1,18 +1,22 @@
 package tests
 
 import (
+	"context"
 	"log"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/canonical/matter-snap-testing/utils"
+	"github.com/stretchr/testify/assert"
 )
 
-var start = time.Now()
+const (
+	allClustersAppBin = "bin/chip-all-clusters-minimal-app-commit-1536ca2"
+	allClustersAppLog = "chip-all-clusters-minimal-app.log"
+)
 
 func TestMain(m *testing.M) {
 	teardown, err := setup()
@@ -26,64 +30,30 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func TestMatterDeviceOperations(t *testing.T) {
-	const (
-		chipAllClusterMinimalAppFile = "bin/chip-all-clusters-minimal-app-commit-1536ca2"
-		chipAllClusterMinimalAppLog  = "chip-all-clusters-minimal-app.log"
-	)
+func TestAllClustersApp(t *testing.T) {
+	startAllClustersApp(t)
 
-	// Setup: remove exisiting log files
-	if err := os.Remove("./" + chipAllClusterMinimalAppLog); err != nil && !os.IsNotExist(err) {
-		t.Fatalf("Error deleting log file: %s\n", err)
-	}
-	if err := os.Remove("./chip-tool.log"); err != nil && !os.IsNotExist(err) {
-		t.Fatalf("Error deleting log file: %s\n", err)
-	}
-
-	// Setup: run and log chip-all-clusters-minimal-app in the background
-	logFile, err := os.Create(chipAllClusterMinimalAppLog)
-	if err != nil {
-		t.Fatalf("Error creating log file: %s\n", err)
-	}
-
-	cmd := exec.Command("./" + chipAllClusterMinimalAppFile)
-	cmd.Stdout = logFile
-	cmd.Stderr = logFile
-
-	err = cmd.Start()
-	if err != nil {
-		t.Fatalf("Error starting application: %s\n", err)
-	}
-
-	t.Cleanup(func() {
-		matches, err := filepath.Glob("/tmp/chip_*")
-		if err != nil {
-			t.Fatalf("Error finding tmp chip files: %s\n", err)
-		}
-
-		for _, match := range matches {
-			if err := os.Remove(match); err != nil {
-				t.Fatalf("Error removing tmp chip file %s: %s\n", match, err)
-			}
-		}
-
-		if err := cmd.Process.Kill(); err != nil {
-			t.Fatalf("Error killing process: %s\n", err)
-		}
-
-		if logFile != nil {
-			logFile.Close()
-		}
-	})
+	// wait for startup
+	waitForLogMessage(t,
+		allClustersAppLog, "CHIP minimal mDNS started advertising")
 
 	t.Run("Commission", func(t *testing.T) {
-		utils.Exec(t, "sudo chip-tool pairing onnetwork 110 20202021")
+		stdout, _, _ := utils.Exec(t, "sudo chip-tool pairing onnetwork 110 20202021 2>&1")
+		assert.NoError(t,
+			os.WriteFile("chip-tool-pairing.log", []byte(stdout), 0644),
+		)
 	})
 
 	t.Run("Control", func(t *testing.T) {
-		utils.Exec(t, "sudo chip-tool onoff toggle 110 1")
-		waitForAppMessage(t, "./"+chipAllClusterMinimalAppLog, "CHIP:ZCL: Toggle ep1 on/off", start)
+		stdout, _, _ := utils.Exec(t, "sudo chip-tool onoff toggle 110 1 2>&1")
+		assert.NoError(t,
+			os.WriteFile("chip-tool-onoff.log", []byte(stdout), 0644),
+		)
+
+		waitForLogMessage(t,
+			allClustersAppLog, "CHIP:ZCL: Toggle ep1 on/off")
 	})
+
 }
 
 func setup() (teardown func(), err error) {
@@ -96,7 +66,6 @@ func setup() (teardown func(), err error) {
 
 	teardown = func() {
 		log.Println("[TEARDOWN]")
-		utils.SnapDumpLogs(nil, start, chipToolSnap)
 
 		log.Println("Removing installed snap:", !utils.SkipTeardownRemoval)
 		if !utils.SkipTeardownRemoval {
@@ -122,32 +91,48 @@ func setup() (teardown func(), err error) {
 	return
 }
 
-func waitForAppMessage(t *testing.T, appLogPath, expectedLog string, since time.Time) {
+func startAllClustersApp(t *testing.T) {
+	// remove existing temp files
+	utils.Exec(t, "rm -fr /tmp/chip_*")
+
+	logFile, err := os.Create(allClustersAppLog)
+	if err != nil {
+		t.Fatalf("Error creating log file: %s", err)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+
+	cmd := exec.CommandContext(ctx, allClustersAppBin)
+	cmd.Stdout = logFile
+	cmd.Stderr = logFile
+
+	if err := cmd.Start(); err != nil {
+		t.Fatalf("Error starting application: %s", err)
+	}
+
+	t.Cleanup(func() {
+		utils.Exec(t, "rm -f /tmp/chip_*")
+	})
+}
+
+func waitForLogMessage(t *testing.T, logPath, expectedMsg string) {
 	const maxRetry = 10
 
 	for i := 1; i <= maxRetry; i++ {
 		time.Sleep(1 * time.Second)
-		t.Logf("Retry %d/%d: Waiting for expected content in logs: %s", i, maxRetry, expectedLog)
+		t.Logf("Retry %d/%d: Find log message: '%s'", i, maxRetry, expectedMsg)
 
-		logs, err := readLogFile(appLogPath)
+		logs, err := os.ReadFile(logPath)
 		if err != nil {
 			t.Fatalf("Error reading log file: %s\n", err)
-			continue
 		}
 
-		if strings.Contains(logs, expectedLog) {
-			t.Logf("Found expected content in logs: %s", expectedLog)
+		if strings.Contains(string(logs), expectedMsg) {
+			t.Logf("Found log message: '%s'", expectedMsg)
 			return
 		}
 	}
 
 	t.Fatalf("Time out: reached max %d retries.", maxRetry)
-}
-
-func readLogFile(filePath string) (string, error) {
-	text, err := os.ReadFile(filePath)
-	if err != nil {
-		return "", err
-	}
-	return string(text), nil
 }
