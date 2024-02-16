@@ -31,12 +31,11 @@ func TestMain(m *testing.M) {
 }
 
 func TestAllClustersApp(t *testing.T) {
-	start := time.Now()
 	startAllClustersApp(t)
 
 	// wait for startup
 	waitForLogMessage(t,
-		allClustersAppLog, "CHIP minimal mDNS started advertising", start)
+		allClustersAppLog, "CHIP minimal mDNS started advertising")
 
 	t.Run("Commission", func(t *testing.T) {
 		stdout, _, _ := utils.Exec(t, "sudo chip-tool pairing onnetwork 110 20202021 2>&1")
@@ -52,7 +51,7 @@ func TestAllClustersApp(t *testing.T) {
 		)
 
 		waitForLogMessage(t,
-			allClustersAppLog, "CHIP:ZCL: Toggle ep1 on/off", start)
+			allClustersAppLog, "CHIP:ZCL: Toggle ep1 on/off")
 	})
 
 }
@@ -117,7 +116,7 @@ func startAllClustersApp(t *testing.T) {
 	})
 }
 
-func waitForLogMessage(t *testing.T, logPath, expectedMsg string, since time.Time) {
+func waitForLogMessage(t *testing.T, logPath, expectedMsg string) {
 	const maxRetry = 10
 
 	for i := 1; i <= maxRetry; i++ {
@@ -127,7 +126,6 @@ func waitForLogMessage(t *testing.T, logPath, expectedMsg string, since time.Tim
 		logs, err := os.ReadFile(logPath)
 		if err != nil {
 			t.Fatalf("Error reading log file: %s\n", err)
-			continue
 		}
 
 		if strings.Contains(string(logs), expectedMsg) {
