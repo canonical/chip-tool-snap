@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/canonical/matter-snap-testing/utils"
-	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -28,32 +27,6 @@ func TestMain(m *testing.M) {
 	teardown()
 
 	os.Exit(code)
-}
-
-func TestAllClustersApp(t *testing.T) {
-	startAllClustersApp(t)
-
-	// wait for startup
-	waitForLogMessage(t,
-		allClustersAppLog, "CHIP minimal mDNS started advertising")
-
-	t.Run("Commission", func(t *testing.T) {
-		stdout, _, _ := utils.Exec(t, "sudo chip-tool pairing onnetwork 110 20202021 2>&1")
-		assert.NoError(t,
-			os.WriteFile("chip-tool-pairing.log", []byte(stdout), 0644),
-		)
-	})
-
-	t.Run("Control", func(t *testing.T) {
-		stdout, _, _ := utils.Exec(t, "sudo chip-tool onoff toggle 110 1 2>&1")
-		assert.NoError(t,
-			os.WriteFile("chip-tool-onoff.log", []byte(stdout), 0644),
-		)
-
-		waitForLogMessage(t,
-			allClustersAppLog, "CHIP:ZCL: Toggle ep1 on/off")
-	})
-
 }
 
 func setup() (teardown func(), err error) {
@@ -91,7 +64,7 @@ func setup() (teardown func(), err error) {
 	return
 }
 
-func startAllClustersApp(t *testing.T) {
+func startAllClustersApp(t *testing.T, args ...string) {
 	// remove existing temp files
 	utils.Exec(t, "rm -fr /tmp/chip_*")
 
@@ -103,9 +76,10 @@ func startAllClustersApp(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
-	cmd := exec.CommandContext(ctx, allClustersAppBin)
+	cmd := exec.CommandContext(ctx, allClustersAppBin, args...)
 	cmd.Stdout = logFile
 	cmd.Stderr = logFile
+	t.Logf("[exec] %s\n", cmd)
 
 	if err := cmd.Start(); err != nil {
 		t.Fatalf("Error starting application: %s", err)
