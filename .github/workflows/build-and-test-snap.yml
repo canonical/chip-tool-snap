@@ -1,4 +1,4 @@
-name: Build&Test
+name: Snap Tester
 
 on:
   push:
@@ -7,6 +7,10 @@ on:
     branches: [ main ]
   # Allow manual trigger
   workflow_dispatch:
+
+env:
+  SNAP_AMD64: chip-tool_${{ github.run_number}}_amd64.snap
+  SNAP_ARM64: chip-tool_${{ github.run_number}}_arm64.snap
 
 jobs:
   build:
@@ -24,7 +28,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: chip-tool_${{ github.run_number}}_amd64.snap
+          name: ${{ env.SNAP_AMD64 }}
           path: ${{ steps.snapcraft.outputs.snap }}
           if-no-files-found: error
           
@@ -40,7 +44,7 @@ jobs:
       - name: Download locally built snap
         uses: actions/download-artifact@v4
         with:
-          name: ${{ needs.build.outputs.snap }}
+          name: ${{ env.SNAP_AMD64 }}
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -53,7 +57,7 @@ jobs:
         working-directory: tests
         env:
           SKIP_TEARDOWN_REMOVAL: true
-          LOCAL_SERVICE_SNAP: ../${{ needs.build.outputs.snap }}
+          LOCAL_SERVICE_SNAP: ../${{ env.SNAP_AMD64 }}
         run: |
           go test -failfast -p 1 -timeout 30m -v
 
@@ -85,5 +89,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: chip-tool_${{ github.run_number}}_arm64.snap
+          name: ${{ env.SNAP_ARM64 }}
           path: ${{ steps.build.outputs.snap }}
