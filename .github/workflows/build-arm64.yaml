@@ -1,0 +1,35 @@
+name: Build arm64
+
+on:
+  workflow_run:
+    workflows:
+      - Snap Tester
+    types:
+      - completed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      arch: arm64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: ${{ env.arch }}
+
+      - name: Build snap for arm64
+        uses: diddlesnaps/snapcraft-multiarch-action@v1
+        id: build
+        with:
+          architecture: ${{ env.arch }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chip-tool_${{ github.run_number}}_${{ env.arch }}.snap
+          path: ${{ steps.build.outputs.snap }}
