@@ -57,7 +57,7 @@ jobs:
         working-directory: tests
         env:
           SKIP_TEARDOWN_REMOVAL: true
-          LOCAL_SERVICE_SNAP: ../${{ env.SNAP_AMD64 }}
+          LOCAL_SERVICE_SNAP: ../chip-tool_*.snap
         run: |
           go test -failfast -p 1 -timeout 30m -v
 
