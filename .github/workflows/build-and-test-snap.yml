@@ -8,13 +8,16 @@ on:
   # Allow manual trigger
   workflow_dispatch:
 
+env:
+  SNAP_AMD64: chip-tool_${{ github.run_number}}_amd64.snap
+  SNAP_ARM64: chip-tool_${{ github.run_number}}_arm64.snap
+
 jobs:
   build:
     outputs:
       snap: ${{ steps.snapcraft.outputs.snap }}
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -25,7 +28,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.snapcraft.outputs.snap }}
+          name: ${{ env.SNAP_AMD64 }}
           path: ${{ steps.snapcraft.outputs.snap }}
           if-no-files-found: error
           
@@ -33,7 +36,6 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -42,7 +44,7 @@ jobs:
       - name: Download locally built snap
         uses: actions/download-artifact@v4
         with:
-          name: ${{ needs.build.outputs.snap }}
+          name: ${{ env.SNAP_AMD64 }}
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -55,7 +57,7 @@ jobs:
         working-directory: tests
         env:
           SKIP_TEARDOWN_REMOVAL: true
-          LOCAL_SERVICE_SNAP: ../${{ needs.build.outputs.snap }}
+          LOCAL_SERVICE_SNAP: ../chip-tool_*.snap
         run: |
           go test -failfast -p 1 -timeout 30m -v
 
@@ -65,3 +67,27 @@ jobs:
         with:
           name: logs
           path: tests/*.log
+
+  build-arm64:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Build snap
+        uses: diddlesnaps/snapcraft-multiarch-action@v1
+        id: build
+        with:
+          architecture: arm64
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.SNAP_ARM64 }}
+          path: ${{ steps.build.outputs.snap }}
