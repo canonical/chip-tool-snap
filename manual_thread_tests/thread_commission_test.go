@@ -9,22 +9,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const (
-	otbrSnap       = "openthread-border-router"
-	allClusterSnap = "matter-all-clusters-app"
-)
+const otbrSnap = "openthread-border-router"
 
 func TestAllClustersAppThread(t *testing.T) {
-	// Start clean
-	utils.SnapRemove(t, allClusterSnap)
-	utils.SnapRemove(t, otbrSnap)
-	cleanupRemoteDevice(t)
-
 	t.Cleanup(func() {
-		utils.SnapRemove(t, allClusterSnap)
 		utils.SnapRemove(t, otbrSnap)
 		cleanupRemoteDevice(t)
 	})
+
+	// Start clean
+	utils.SnapRemove(t, otbrSnap)
+	cleanupRemoteDevice(t)
 
 	start := time.Now()
 
@@ -48,8 +43,9 @@ func TestAllClustersAppThread(t *testing.T) {
 			os.WriteFile("chip-tool-onoff.log", []byte(stdout), 0644),
 		)
 
-		utils.WaitForLogMessage(t,
-			allClusterSnap, "CHIP:ZCL: Toggle ep1 on/off", start)
+		// TODO: check log on remote device
+		// utils.WaitForLogMessage(t,
+		// 	allClusterSnap, "CHIP:ZCL: Toggle ep1 on/off", start)
 	})
 
 }

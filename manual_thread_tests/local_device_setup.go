@@ -9,14 +9,14 @@ import (
 	"github.com/canonical/matter-snap-testing/utils"
 )
 
-const (
-	defaultInfraInterfaceValue = "wlan0"
-	infraInterfaceKey          = "infra-if"
-	localInfraInterfaceEnv     = "LOCAL_INFRA_IF"
-)
-
 func localDeviceSetup(t *testing.T) {
 	t.Helper()
+
+	const (
+		defaultInfraInterfaceValue = "wlan0"
+		infraInterfaceKey          = "infra-if"
+		localInfraInterfaceEnv     = "LOCAL_INFRA_IF"
+	)
 
 	// Install OTBR
 	utils.SnapInstallFromStore(t, otbrSnap, utils.ServiceChannel)

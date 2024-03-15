@@ -12,24 +12,14 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-const (
-	remoteUserEnv           = "REMOTE_USER"
-	remotePasswordEnv       = "REMOTE_PASSWORD"
-	remoteIPEnv             = "REMOTE_IP"
-	remoteInfraInterfaceEnv = "REMOTE_INFRA_IF"
-
-	defaultSSHConnectionPort = "22"
-	defaultSSHConnectionUser = "ubuntu"
-)
-
 var (
-	remoteSSHClient *ssh.Client
-	remoteSession   *ssh.Session
-
 	remoteUser           = ""
 	remotePassword       = ""
 	remoteIP             = ""
 	remoteInfraInterface = ""
+
+	remoteSSHClient *ssh.Client
+	remoteSession   *ssh.Session
 )
 
 func RemoteDeviceSetup(t *testing.T) {
@@ -50,6 +40,15 @@ func RemoteDeviceSetup(t *testing.T) {
 }
 
 func setRemoteConfigFromEnv() {
+	const (
+		remoteUserEnv           = "REMOTE_USER"
+		remotePasswordEnv       = "REMOTE_PASSWORD"
+		remoteIPEnv             = "REMOTE_IP"
+		remoteInfraInterfaceEnv = "REMOTE_INFRA_IF"
+
+		defaultSSHConnectionUser = "ubuntu"
+	)
+
 	if v := os.Getenv(remoteUserEnv); v != "" {
 		remoteUser = v
 	} else {
@@ -71,6 +70,8 @@ func setRemoteConfigFromEnv() {
 
 func establishSSHConnection(t *testing.T) {
 	t.Helper()
+
+	const defaultSSHConnectionPort = "22"
 
 	if remoteSSHClient != nil {
 		return
@@ -182,27 +183,4 @@ func executeRemoteCommands(t *testing.T, commands []string) {
 		output := executeRemoteCommand(t, cmd)
 		t.Logf("Executed the command remotely: %s\nOutput: %s\n", cmd, output)
 	}
-}
-
-func waitForLogMessage(t *testing.T, logPath, expectedMsg string) {
-	t.Helper()
-
-	const maxRetry = 10
-
-	for i := 1; i <= maxRetry; i++ {
-		time.Sleep(1 * time.Second)
-		t.Logf("Retry %d/%d: Find log message: '%s'", i, maxRetry, expectedMsg)
-
-		logs, err := os.ReadFile(logPath)
-		if err != nil {
-			t.Fatalf("Error reading log file: %s\n", err)
-		}
-
-		if strings.Contains(string(logs), expectedMsg) {
-			t.Logf("Found log message: '%s'", expectedMsg)
-			return
-		}
-	}
-
-	t.Fatalf("Time out: reached max %d retries.", maxRetry)
 }
