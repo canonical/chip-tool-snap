@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/canonical/matter-snap-testing/utils"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -24,11 +23,6 @@ var (
 
 func RemoteDeviceSetup(t *testing.T) {
 	t.Helper()
-
-	t.Cleanup(func() {
-		defer remoteSSHClient.Close()
-		defer remoteSession.Close()
-	})
 
 	setRemoteConfigFromEnv()
 
@@ -93,7 +87,6 @@ func establishSSHConnection(t *testing.T) {
 	}
 
 	t.Logf("SSH connection to %s established successfully", remoteIP)
-
 }
 
 func deployOTBRAgentOnRemoteDevice(t *testing.T) error {
@@ -120,24 +113,22 @@ func deployOTBRAgentOnRemoteDevice(t *testing.T) error {
 func startAllClustersAppOnRemoteDevice(t *testing.T, args ...string) error {
 	t.Helper()
 
-	start := time.Now()
+	start := time.Now().UTC()
 
 	commands := []string{
 		"sudo apt install bluez",
-		"sudo snap remove --purge matter-all-clusters-app",
-		"sudo snap install matter-all-clusters-app --edge",
-		fmt.Sprintf("sudo snap set matter-all-clusters-app args='%s'", strings.Join(args, " ")),
-		"sudo snap connect matter-all-clusters-app:avahi-control",
-		"sudo snap connect matter-all-clusters-app:bluez",
-		"sudo snap connect matter-all-clusters-app:otbr-dbus-wpan0 openthread-border-router:dbus-wpan0",
-		"sudo snap start matter-all-clusters-app",
+		"sudo snap remove --purge " + allClusterSnap,
+		"sudo snap install " + allClusterSnap + " --edge",
+		fmt.Sprintf("sudo snap set "+allClusterSnap+" args='%s'", strings.Join(args, " ")),
+		"sudo snap connect " + allClusterSnap + ":avahi-control",
+		"sudo snap connect " + allClusterSnap + ":bluez",
+		"sudo snap connect " + allClusterSnap + ":otbr-dbus-wpan0 openthread-border-router:dbus-wpan0",
+		"sudo snap start " + allClusterSnap,
 	}
 
 	executeRemoteCommands(t, commands)
 
-	utils.WaitForLogMessage(t, "matter-all-clusters-app", "CHIP minimal mDNS started advertising", start)
-	// utils.WaitForLogMessage(t, "matter-all-clusters-app", "", start)
-
+	waitForLogMessageOnRemoteDevice(t, allClusterSnap, "CHIP minimal mDNS started advertising", start)
 	t.Log("Running matter all clusters app")
 
 	return nil
@@ -150,7 +141,8 @@ func executeRemoteCommand(t *testing.T, command string) string {
 		t.Fatalf("SSH client not initialized. Please connect to remote device first")
 	}
 
-	remoteSession, err := remoteSSHClient.NewSession()
+	var err error
+	remoteSession, err = remoteSSHClient.NewSession()
 	if err != nil {
 		t.Fatalf("Failed to create session: %v", err)
 	}
@@ -181,6 +173,27 @@ func executeRemoteCommands(t *testing.T, commands []string) {
 
 	for _, cmd := range commands {
 		output := executeRemoteCommand(t, cmd)
-		t.Logf("Executed the command remotely: %s\nOutput: %s\n", cmd, output)
+		t.Logf("Executed the command remotely: %s", cmd)
+		t.Logf("Output: %s", output)
 	}
+}
+
+func waitForLogMessageOnRemoteDevice(t *testing.T, snap string, expectedLog string, start time.Time) {
+	t.Helper()
+
+	const maxRetry = 10
+	for i := 1; i <= maxRetry; i++ {
+		time.Sleep(1 * time.Second)
+		t.Logf("Retry %d/%d: Waiting for expected content in logs: %s", i, maxRetry, expectedLog)
+
+		command := fmt.Sprintf("sudo journalctl --since \"%s\" --no-pager | grep \"%s\"|| true", start.Format("2006-01-02 15:04:05"), snap)
+		t.Logf(command)
+		logs := executeRemoteCommand(t, command)
+		if strings.Contains(logs, expectedLog) {
+			t.Logf("Found expected content in logs: %s", expectedLog)
+			return
+		}
+	}
+
+	t.Fatalf("Time out: reached max %d retries.", maxRetry)
 }

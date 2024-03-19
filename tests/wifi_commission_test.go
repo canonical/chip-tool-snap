@@ -22,13 +22,16 @@ func TestAllClustersAppWiFi(t *testing.T) {
 		utils.SnapDumpLogs(nil, start, allClusterSnap)
 	})
 
-	// Install and setup all clusters app
+	// Install all clusters app
 	utils.SnapInstallFromStore(t, allClusterSnap, utils.ServiceChannel)
+
+	// Setup all clusters app
 	utils.SnapSet(t, allClusterSnap, "args", "--wifi")
 	utils.SnapConnect(t, allClusterSnap+":avahi-control", "")
 	utils.SnapConnect(t, allClusterSnap+":bluez", "")
-	utils.SnapStart(t, allClusterSnap)
 
+	// Start all clusters app
+	utils.SnapStart(t, allClusterSnap)
 	utils.WaitForLogMessage(t,
 		allClusterSnap, "CHIP minimal mDNS started advertising", start)
 
