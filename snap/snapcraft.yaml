@@ -1,7 +1,8 @@
 name: chip-tool 
 summary: Chip Tool Matter Controller
 description: Refer to https://snapcraft.io/chip-tool
-adopt-info: connectedhomeip
+
+version: v1.3.0.0+snap
 
 confinement: strict
 grade: stable
@@ -18,54 +19,30 @@ layout:
     bind: $SNAP_COMMON/mnt
 
 parts:
-  connectedhomeip:
-    plugin: nil
-    build-environment:
-      - TAG: master
-    override-pull: |
-      # shallow clone the project its submodules
-      git clone https://github.com/project-chip/connectedhomeip.git --depth=1 --branch=$TAG .
-      scripts/checkout_submodules.py --shallow --platform linux
-      
-      # set the snap version
-      craftctl set version=$TAG+snap
+  matter-sdk:
+    plugin: matter-sdk
+    matter-sdk-version: v1.3.0.0
       
   chip-tool:
-    after: [connectedhomeip]
+    after: 
+      - matter-sdk
     plugin: nil
     override-build: |
+      # Prepare the environment for using the SDK
+      source $CRAFT_STAGE/matter-sdk-env.sh
+      
+      # Build the chip tool, which is part of the SDK itself
+      SDK_PROJECT=../../matter-sdk/build
+      cd $SDK_PROJECT/examples/chip-tool
+      gn gen out
+      ninja -C out
+      
+      # List shared libraries
+      ldd out/chip-tool
 
+      # Stage the binary distribution
       mkdir -p $CRAFT_PART_INSTALL/bin
-
-      cd ../../connectedhomeip/src
-      
-      # The project writes its data to /tmp which isn't persisted.
-      #
-      # Setting TMPDIR env var when running the app isn't sufficient as 
-      #  chip_[config,counter,factory,kvs].ini still get written under /tmp.
-      # The chip-tool currently has no way of overriding the default paths to
-      #   storage and security config files.
-      #
-      # Snap does not allow bind mounting a persistent directory on /tmp, 
-      #  so we need to replace it in the source with another path, e.g. /mnt.
-      # See the top-level layout definition which bind mounts a persisted
-      #   directory within the confined snap space on /mnt.
-      #
-      # Replace storage paths:
-      sed -i 's/\/tmp/\/mnt/g' src/platform/Linux/CHIPLinuxStorage.h
-      # Replace key-value store path:
-      sed -i 's/\/tmp/\/mnt/g' src/platform/Linux/CHIPPlatformConfig.h
-
-      # To avoid activation errors, don't treat unset variables as error
-      set +u 
-
-      # Bootstrap with minimal "build" requirements
-      source ./scripts/setup/bootstrap.sh --platform build
-
-      # Build the chip tool
-      ./scripts/examples/gn_build_example.sh examples/chip-tool ./build-examples
-      
-      cp build-examples/chip-tool $CRAFT_PART_INSTALL/bin/
+      cp out/chip-tool $CRAFT_PART_INSTALL/bin/chip-tool
     build-packages:
       - git
       - gcc
