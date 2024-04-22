@@ -1,4 +1,4 @@
-package tests
+package thread_tests
 
 import (
 	"os"
@@ -7,12 +7,16 @@ import (
 	"time"
 
 	"github.com/canonical/matter-snap-testing/utils"
+	"github.com/stretchr/testify/require"
 )
 
-const OTCTL = "openthread-border-router.ot-ctl"
+const (
+	otbrSnap = "openthread-border-router"
+	OTCTL    = otbrSnap + ".ot-ctl"
+)
 
-func localDeviceOTBRSetup(t *testing.T) {
-	t.Helper()
+func setup(t *testing.T) {
+	installChipTool(t)
 
 	const (
 		defaultInfraInterfaceValue = "wlan0"
@@ -20,13 +24,19 @@ func localDeviceOTBRSetup(t *testing.T) {
 		localInfraInterfaceEnv     = "LOCAL_INFRA_IF"
 	)
 
+	// Clean
+	utils.SnapRemove(t, otbrSnap)
+
 	// Install OTBR
 	utils.SnapInstallFromStore(t, otbrSnap, utils.ServiceChannel)
+	t.Cleanup(func() {
+		utils.SnapRemove(t, otbrSnap)
+	})
 
 	// Connect interfaces
-	snapInterfaces := []string{":avahi-control", ":firewall-control", ":raw-usb", ":network-control", ":bluetooth-control", ":bluez"}
-	for _, interf := range snapInterfaces {
-		utils.SnapConnect(nil, otbrSnap+interf, "")
+	snapInterfaces := []string{"avahi-control", "firewall-control", "raw-usb", "network-control", "bluetooth-control", "bluez"}
+	for _, interfaceSlot := range snapInterfaces {
+		utils.SnapConnect(nil, otbrSnap+":"+interfaceSlot, "")
 	}
 
 	// Set infra interface
@@ -51,10 +61,35 @@ func localDeviceOTBRSetup(t *testing.T) {
 }
 
 func getActiveDataset(t *testing.T) string {
-	t.Helper()
-
 	activeDataset, _, _ := utils.Exec(t, "sudo "+OTCTL+" dataset active -x | awk '{print $NF}' | grep --invert-match \"Done\"")
 	trimmedActiveDataset := strings.TrimSpace(activeDataset)
 
 	return trimmedActiveDataset
+}
+
+func installChipTool(t *testing.T) {
+	const chipToolSnap = "chip-tool"
+
+	// clean
+	utils.SnapRemove(t, chipToolSnap)
+
+	if utils.LocalServiceSnap() {
+		require.NoError(t,
+			utils.SnapInstallFromFile(nil, utils.LocalServiceSnapPath),
+		)
+	} else {
+		require.NoError(t,
+			utils.SnapInstallFromStore(nil, chipToolSnap, utils.ServiceChannel),
+		)
+	}
+	t.Cleanup(func() {
+		utils.SnapRemove(t, chipToolSnap)
+	})
+
+	// connect interfaces
+	utils.SnapConnect(t, chipToolSnap+":avahi-observe", "")
+	utils.SnapConnect(t, chipToolSnap+":bluez", "")
+	utils.SnapConnect(t, chipToolSnap+":process-control", "")
+
+	return
 }
