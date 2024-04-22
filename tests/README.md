@@ -12,5 +12,5 @@ where:
 ## Environment variables 
 
 Some environment variables can modify the test functionality. Refer to these in
-[the documentation](https://pkg.go.dev/github.com/canonical/matter-snap-testing@v1.0.0-beta.3/env)
+[the documentation](https://pkg.go.dev/github.com/canonical/matter-snap-testing/env)
 of the `matter-snap-testing` Go package.
