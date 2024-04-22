@@ -186,8 +186,7 @@ func waitForLogMessageOnRemoteDevice(t *testing.T, snap string, expectedLog stri
 		time.Sleep(1 * time.Second)
 		t.Logf("Retry %d/%d: Waiting for expected content in logs: %s", i, maxRetry, expectedLog)
 
-		command := fmt.Sprintf("sudo journalctl --since \"%s\" --no-pager | grep \"%s\"|| true", start.Format("2006-01-02 15:04:05"), snap)
-		t.Logf(command)
+		command := fmt.Sprintf("sudo journalctl --utc --since \"%s\" --no-pager | grep \"%s\"|| true", start.UTC().Format("2006-01-02 15:04:05"), expectedLog)
 		logs := executeRemoteCommand(t, command)
 		if strings.Contains(logs, expectedLog) {
 			t.Logf("Found expected content in logs: %s", expectedLog)

@@ -32,7 +32,7 @@ func TestAllClustersAppThread(t *testing.T) {
 	RemoteDeviceSetup(t)
 
 	t.Run("Commission", func(t *testing.T) {
-		stdout, _, _ := utils.Exec(t, "sudo chip-tool pairing ble-thread 110 hex:"+trimmedActiveDataset+" 20202021 3840 2>&1")
+		stdout, _, _ := utils.Exec(t, "sudo chip-tool pairing code-thread 110 hex:"+trimmedActiveDataset+" 34970112332 2>&1")
 		assert.NoError(t,
 			os.WriteFile("chip-tool-pairing.log", []byte(stdout), 0644),
 		)
