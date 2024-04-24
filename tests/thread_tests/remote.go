@@ -92,7 +92,7 @@ func remote_deployOTBRAgent(t *testing.T) error {
 		"sudo snap remove --purge openthread-border-router",
 		"sudo snap install openthread-border-router --edge",
 		"sudo snap set openthread-border-router infra-if='" + remoteInfraInterface + "'",
-		"sudo snap connect openthread-border-router:avahi-control",
+		// "sudo snap connect openthread-border-router:avahi-control",
 		"sudo snap connect openthread-border-router:firewall-control",
 		"sudo snap connect openthread-border-router:raw-usb",
 		"sudo snap connect openthread-border-router:network-control",
