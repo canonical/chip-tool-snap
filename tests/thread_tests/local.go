@@ -1,6 +1,7 @@
 package thread_tests
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -50,7 +51,7 @@ func setup(t *testing.T) {
 	// Start OTBR
 	start := time.Now()
 	utils.SnapStart(t, otbrSnap)
-	utils.WaitForLogMessage(t, otbrSnap, "Start Thread Border Agent: OK", start)
+	waitForLogMessage(t, otbrSnap, "Start Thread Border Agent: OK", start)
 
 	// Form Thread network
 	utils.Exec(t, "sudo "+OTCTL+" dataset init new")
@@ -92,4 +93,27 @@ func installChipTool(t *testing.T) {
 	utils.SnapConnect(t, chipToolSnap+":process-control", "")
 
 	return
+}
+
+// TODO: update the library function to print the tail before failing:
+// https://github.com/canonical/matter-snap-testing/blob/abae29ac5e865f0c5208350bdab63cecb3bdcc5a/utils/config.go#L54-L69
+func waitForLogMessage(t *testing.T, snap, expectedLog string, since time.Time) {
+	const maxRetry = 10
+
+	for i := 1; i <= maxRetry; i++ {
+		time.Sleep(1 * time.Second)
+		t.Logf("Retry %d/%d: Waiting for expected content in logs: %s", i, maxRetry, expectedLog)
+
+		logs := utils.SnapLogs(t, since, snap)
+		if strings.Contains(logs, expectedLog) {
+			t.Logf("Found expected content in logs: %s", expectedLog)
+			return
+		}
+	}
+
+	t.Logf("Time out: reached max %d retries.", maxRetry)
+	stdout, _, _ := utils.Exec(t,
+		fmt.Sprintf("sudo journalctl --lines=10 --no-pager --unit=snap.\"%s\".otbr-agent --priority=notice", snap))
+	t.Log(stdout)
+	t.FailNow()
 }

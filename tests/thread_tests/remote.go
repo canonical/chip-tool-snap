@@ -82,11 +82,13 @@ func connectSSH(t *testing.T) {
 	t.Logf("SSH: connected to %s", remoteHost)
 }
 
-func remote_deployOTBRAgent(t *testing.T) error {
+func remote_deployOTBRAgent(t *testing.T) {
 
 	t.Cleanup(func() {
 		remote_exec(t, "sudo snap remove --purge openthread-border-router")
 	})
+
+	start := time.Now().UTC()
 
 	commands := []string{
 		"sudo snap remove --purge openthread-border-router",
@@ -104,7 +106,8 @@ func remote_deployOTBRAgent(t *testing.T) error {
 		remote_exec(t, cmd)
 	}
 
-	return nil
+	remote_waitForLogMessage(t, otbrSnap, "Start Thread Border Agent: OK", start)
+	t.Log("OTBR on remote device is ready")
 }
 
 func remote_deployAllClustersApp(t *testing.T) {
@@ -130,7 +133,7 @@ func remote_deployAllClustersApp(t *testing.T) {
 	}
 
 	remote_waitForLogMessage(t, "matter-all-clusters-app", "CHIP minimal mDNS started advertising", start)
-	t.Log("Running Matter All Clusters App")
+	t.Log("Matter All Clusters App is ready")
 }
 
 func remote_exec(t *testing.T, command string) string {
@@ -184,5 +187,7 @@ func remote_waitForLogMessage(t *testing.T, snap string, expectedLog string, sta
 		}
 	}
 
-	t.Fatalf("Time out: reached max %d retries.", maxRetry)
+	t.Logf("Time out: reached max %d retries.", maxRetry)
+	t.Log(remote_exec(t, "journalctl --no-pager --lines=10 --unit=snap.openthread-border-router.otbr-agent --priority=notice"))
+	t.FailNow()
 }
