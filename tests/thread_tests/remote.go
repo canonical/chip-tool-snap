@@ -96,8 +96,8 @@ func remote_deployOTBRAgent(t *testing.T) error {
 		"sudo snap connect openthread-border-router:firewall-control",
 		"sudo snap connect openthread-border-router:raw-usb",
 		"sudo snap connect openthread-border-router:network-control",
-		"sudo snap connect openthread-border-router:bluetooth-control",
-		"sudo snap connect openthread-border-router:bluez",
+		// "sudo snap connect openthread-border-router:bluetooth-control",
+		// "sudo snap connect openthread-border-router:bluez",
 		"sudo snap start openthread-border-router",
 	}
 	for _, cmd := range commands {
