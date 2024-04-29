@@ -12,6 +12,8 @@ import (
 const allClusterSnap = "matter-all-clusters-app"
 
 func TestAllClustersAppWiFi(t *testing.T) {
+	InstallChipTool(t)
+
 	start := time.Now()
 
 	// Start clean
