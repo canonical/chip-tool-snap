@@ -31,7 +31,7 @@ sudo snap connect chip-tool:process-control
 ```
 
 > **Note**  
-> On **Ubuntu Core**, the `avahi-control` and `bluez` interfaces are not provided by the system.
+> On **Ubuntu Core**, the `avahi-observe` and `bluez` interfaces are not provided by the system.
 >
 > These interfaces are provided by other snaps, such as the [Avahi](https://snapcraft.io/avahi) and [BlueZ](https://snapcraft.io/bluez) snaps.
 > To install the snaps and connect to the interfaces, run:

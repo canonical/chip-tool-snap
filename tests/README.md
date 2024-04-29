@@ -19,3 +19,9 @@ For building and flashing RCP firmware, please refer to [Build and flash RCP fir
 LOCAL_INFRA_IF="eno1" REMOTE_INFRA_IF="eth0" REMOTE_USER="ubuntu" REMOTE_PASSWORD="abcdef" REMOTE_HOST="192.168.178.95" go test -v -failfast -count 1 ./thread_tests
 ```
 
+## Environment variables 
+
+Some environment variables can modify the test functionality. Refer to these in
+[the documentation](https://pkg.go.dev/github.com/canonical/matter-snap-testing/env)
+of the `matter-snap-testing` Go package.
+
