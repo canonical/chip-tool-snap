@@ -13,11 +13,16 @@ architectures:
   - build-on: amd64
   - build-on: arm64
 
-layout:
-  /mnt:
-    bind: $SNAP_COMMON/mnt
-
 parts:
+  local:
+    plugin: nil
+    source: snap/local
+    override-build: |
+      BIN=$SNAPCRAFT_PART_INSTALL/bin
+      mkdir -p $BIN
+      cp -v bin/* $BIN/
+      chmod +x $BIN/*
+
   connectedhomeip:
     plugin: nil
     build-environment:
@@ -40,23 +45,6 @@ parts:
       mkdir -p $CRAFT_PART_INSTALL/bin
 
       cd ../../connectedhomeip/src
-      
-      # The project writes its data to /tmp which isn't persisted.
-      #
-      # Setting TMPDIR env var when running the app isn't sufficient as 
-      #  chip_[config,counter,factory,kvs].ini still get written under /tmp.
-      # The chip-tool currently has no way of overriding the default paths to
-      #   storage and security config files.
-      #
-      # Snap does not allow bind mounting a persistent directory on /tmp, 
-      #  so we need to replace it in the source with another path, e.g. /mnt.
-      # See the top-level layout definition which bind mounts a persisted
-      #   directory within the confined snap space on /mnt.
-      #
-      # Replace storage paths:
-      sed -i 's/\/tmp/\/mnt/g' src/platform/Linux/CHIPLinuxStorage.h
-      # Replace key-value store path:
-      sed -i 's/\/tmp/\/mnt/g' src/platform/Linux/CHIPPlatformConfig.h
 
       # To avoid activation errors, don't treat unset variables as error
       set +u 
@@ -88,6 +76,7 @@ parts:
 
 apps:
   chip-tool:
+    command-chain: [bin/set-tmp-dir.sh]
     command: bin/chip-tool
     plugs:
       - network
@@ -95,6 +84,3 @@ apps:
       - bluez
       - avahi-observe
       - process-control
-    environment:
-      # Replace the path for chip-tool configuration files
-      TMPDIR: "/mnt"
