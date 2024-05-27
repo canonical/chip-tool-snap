@@ -15,23 +15,22 @@ This snap has been tested on amd64/arm64 architectures for WiFi/Ethernet/DNS-SD/
 sudo snap install chip-tool
 ```
 
+When installing from the Snap Store, the following interfaces auto-connect:
+- [`avahi-observe`](https://snapcraft.io/docs/avahi-observe-interface) to allow DNS-SD based discovery.
+- [`bluez`](https://snapcraft.io/docs/bluez-interface) for device discovery over Bluetooth Low Energy (BLE).
+
+> **Note**  
+> DNS-SD and Bluetooth depend on Avahi and Bluez.
+> To install:
+> - Ubuntu: `sudo apt install bluez avahi-daemon`
+> - Ubuntu Core: `sudo snap install avahi bluez`
+
+
 You may connect the [`process-control`](https://snapcraft.io/docs/process-control-interface) interface to allow system-wide process management.
 This is needed to grant Chip Tool access to make [sched_setattr](https://man7.org/linux/man-pages/man2/sched_setattr.2.html) system calls. This may improve the reliability of the commissioning and control operations (see [#8](https://github.com/canonical/chip-tool-snap/issues/8)).
 ```bash
 sudo snap connect chip-tool:process-control
 ```
-
-> **Note**  
-> On **Ubuntu Core**, the `avahi-observe` and `bluez` interfaces are not provided by the system.
->
-> These interfaces are provided by other snaps, such as the [Avahi](https://snapcraft.io/avahi) and [BlueZ](https://snapcraft.io/bluez) snaps.
-> To install the snaps and connect to the interfaces, run:
-> ```bash
-> sudo snap install avahi bluez
-> sudo snap connect chip-tool:avahi-observe avahi:avahi-observe
-> sudo snap connect chip-tool:bluez bluez:service
-> ```
-> 
 
 ### Commissioning into IP network
 Discover using DNS-SD and pair:
@@ -93,6 +92,32 @@ Build remotely for all supported architectures:
 ```
 snapcraft remote-build
 ```
+
+### Install the built snap
+
+Install the local snap:
+```bash
+sudo snap install --dangerous *.snap
+```
+
+Connect the following interfaces:
+```bash
+sudo snap connect chip-tool:avahi-observe
+sudo snap connect chip-tool:bluez
+```
+
+> **Note**  
+> On **Ubuntu Core**, the `avahi-observe` and `bluez` interfaces are not provided by the system.
+> These interfaces are provided by other snaps, such as the [Avahi](https://snapcraft.io/avahi) and [BlueZ](https://snapcraft.io/bluez) snaps.
+> To install the snaps and connect the interfaces, run:
+> ```bash
+> sudo snap install avahi bluez
+> sudo snap connect chip-tool:avahi-observe avahi:avahi-observe
+> sudo snap connect chip-tool:bluez bluez:service
+> ```
+
+
+Continue the [setup](#setup).
 
 ## Test
 
