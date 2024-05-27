@@ -15,17 +15,8 @@ This snap has been tested on amd64/arm64 architectures for WiFi/Ethernet/DNS-SD/
 sudo snap install chip-tool
 ```
 
-Connect the [`avahi-observe`](https://snapcraft.io/docs/avahi-observe-interface) interface to allow DNS-SD based discovery:
-```bash
-sudo snap connect chip-tool:avahi-observe
-```
-
-Connect the [`bluez`](https://snapcraft.io/docs/bluez-interface) interface for device discovery over Bluetooth Low Energy (BLE):
-```bash
-sudo snap connect chip-tool:bluez
-```
-
-Connect the [`process-control`](https://snapcraft.io/docs/process-control-interface) interface for system-wide process management. This is needed to grant Chip Tool access to make [sched_setattr](https://man7.org/linux/man-pages/man2/sched_setattr.2.html) system calls. This may improve the reliability of the operations (see https://github.com/canonical/chip-tool-snap/issues/8).
+You may connect the [`process-control`](https://snapcraft.io/docs/process-control-interface) interface to allow system-wide process management.
+This is needed to grant Chip Tool access to make [sched_setattr](https://man7.org/linux/man-pages/man2/sched_setattr.2.html) system calls. This may improve the reliability of the commissioning and control operations (see [#8](https://github.com/canonical/chip-tool-snap/issues/8)).
 ```bash
 sudo snap connect chip-tool:process-control
 ```
