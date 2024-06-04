@@ -16,7 +16,12 @@ For running Thread tests, two Radio Co-Processors (RCPs) are needed for both loc
 For building and flashing RCP firmware, please refer to [Build and flash RCP firmware on nRF52480 dongle](https://github.com/canonical/openthread-border-router-snap/wiki/Setup-OpenThread-Border-Router-with-nRF52840-Dongle#build-and-flash-rcp-firmware-on-nrf52480-dongle).
 
 ```bash
-LOCAL_INFRA_IF="eno1" REMOTE_INFRA_IF="eth0" REMOTE_USER="ubuntu" REMOTE_PASSWORD="abcdef" REMOTE_HOST="192.168.178.95" go test -v -failfast -count 1 ./thread_tests
+LOCAL_INFRA_IF="eno1" \
+REMOTE_INFRA_IF="eth0" \
+REMOTE_USER="ubuntu" \
+REMOTE_PASSWORD="abcdef" \
+REMOTE_HOST="192.168.178.95" \
+go test -v -failfast -count 1 ./thread_tests
 ```
 
 ## Environment variables 
