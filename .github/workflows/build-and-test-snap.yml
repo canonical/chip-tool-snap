@@ -69,7 +69,7 @@ jobs:
           path: tests/*.log
 
   build-arm64:
-    needs: test
+    needs: test # to ensure the tests pass on amd64 before building arm64
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
