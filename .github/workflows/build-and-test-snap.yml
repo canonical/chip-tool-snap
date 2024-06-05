@@ -31,106 +31,75 @@ jobs:
           name: ${{ env.SNAP_AMD64 }}
           path: ${{ steps.snapcraft.outputs.snap }}
           if-no-files-found: error
-
-  # build:
-  #   # fake build
-  #   outputs:
-  #     snap: ${{ steps.snapcraft.outputs.snap }}
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-
-  #     - name: Build snap
-  #       run: |
-  #         echo "test" > chip-tool_00509948+snap_amd64.snap
-  #         echo "snap=chip-tool_00509948+snap_amd64.snap" >> "$GITHUB_OUTPUT"
-  #       id: snapcraft
-
-  #     - name: Upload artifact
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: ${{ env.SNAP_AMD64 }}
-  #         path: ${{ steps.snapcraft.outputs.snap }}
-  #         if-no-files-found: error
           
-  # test:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #       with:
-  #         lfs: true
-      
-  #     - name: Download locally built snap
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: ${{ env.SNAP_AMD64 }}
-
-  #     - name: Setup Go
-  #       uses: actions/setup-go@v5
-  #       with:
-  #         go-version: '1.*'
-  #         cache: false
-
-  #     - name: Run tests
-  #       shell: bash
-  #       working-directory: tests
-  #       env:
-  #         SKIP_TEARDOWN_REMOVAL: true
-  #         LOCAL_SERVICE_SNAP: ../chip-tool_*.snap
-  #       run: |
-  #         go test -failfast -p 1 -timeout 30m -v
-
-  #     - name: Upload snap logs
-  #       if: always() 
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: logs
-  #         path: tests/*.log
-
-  # build-arm64:
-  #   needs: test
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-
-  #     - name: Setup QEMU
-  #       uses: docker/setup-qemu-action@v3
-  #       with:
-  #         platforms: arm64
-
-  #     - name: Build snap
-  #       uses: diddlesnaps/snapcraft-multiarch-action@v1
-  #       id: build
-  #       with:
-  #         architecture: arm64
-
-  #     - name: Upload artifact
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: ${{ env.SNAP_ARM64 }}
-  #         path: ${{ steps.build.outputs.snap }}
-
-  publish-snap:
+  test:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          lfs: true
       
       - name: Download locally built snap
         uses: actions/download-artifact@v4
         with:
           name: ${{ env.SNAP_AMD64 }}
 
-      - name: Check file
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.*'
+          cache: false
+
+      - name: Run tests
+        shell: bash
+        working-directory: tests
         env:
-          FILENAME: ${{needs.build.outputs.snap}}
+          SKIP_TEARDOWN_REMOVAL: true
+          LOCAL_SERVICE_SNAP: ../chip-tool_*.snap
         run: |
-          echo "Looking for $FILENAME"
-          ls -lah
-          cat $FILENAME
+          go test -failfast -p 1 -timeout 30m -v
+
+      - name: Upload snap logs
+        if: always() 
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs
+          path: tests/*.log
+
+  build-arm64:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Build snap
+        uses: diddlesnaps/snapcraft-multiarch-action@v1
+        id: build
+        with:
+          architecture: arm64
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.SNAP_ARM64 }}
+          path: ${{ steps.build.outputs.snap }}
+
+  publish-snap:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download locally built snap
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.SNAP_AMD64 }}
 
       - uses: snapcore/action-publish@v1
         env:
