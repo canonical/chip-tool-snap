@@ -124,6 +124,14 @@ jobs:
         with:
           name: ${{ env.SNAP_AMD64 }}
 
+      - name: Check file
+        env:
+          FILENAME: ${{needs.build.outputs.snap}}
+        run: |
+          echo "Looking for $FILENAME"
+          ls -lah
+          cat $FILENAME
+
       - uses: snapcore/action-publish@v1
         with:
           store_login: ${{ secrets.STORE_LOGIN }}
