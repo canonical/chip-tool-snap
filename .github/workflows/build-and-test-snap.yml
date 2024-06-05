@@ -13,24 +13,24 @@ env:
   SNAP_ARM64: chip-tool_${{ github.run_number}}_arm64.snap
 
 jobs:
-  build:
-    outputs:
-      snap: ${{ steps.snapcraft.outputs.snap }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  # build:
+  #   outputs:
+  #     snap: ${{ steps.snapcraft.outputs.snap }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Build snap
-        uses: snapcore/action-build@v1
-        id: snapcraft
+  #     - name: Build snap
+  #       uses: snapcore/action-build@v1
+  #       id: snapcraft
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.SNAP_AMD64 }}
-          path: ${{ steps.snapcraft.outputs.snap }}
-          if-no-files-found: error
+  #     - name: Upload artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: ${{ env.SNAP_AMD64 }}
+  #         path: ${{ steps.snapcraft.outputs.snap }}
+  #         if-no-files-found: error
           
   # test:
   #   needs: build
@@ -93,14 +93,15 @@ jobs:
   #         path: ${{ steps.build.outputs.snap }}
 
   publish-snap:
-    needs: build
+    # needs: build
     runs-on: ubuntu-latest
     steps:
       
       - name: Download locally built snap
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.SNAP_AMD64 }}
+          # name: ${{ env.SNAP_AMD64 }}
+          name: chip-tool_77_amd64.snap
 
       - name: list
         run: ls -lah
