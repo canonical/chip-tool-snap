@@ -16,7 +16,7 @@ jobs:
   build-amd64:
     outputs:
       snap: ${{ steps.snapcraft.outputs.snap }}
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
           
   test-amd64:
     needs: build-amd64
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -70,7 +70,7 @@ jobs:
 
   publish-amd64:
     needs: [build-amd64, test-amd64]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - name: Download locally built snap
         uses: actions/download-artifact@v4
@@ -84,42 +84,42 @@ jobs:
           snap: ${{ needs.build-amd64.outputs.snap }}
           release: edge/ieng-1057
 
-  # build-arm64:
-  #   needs: test-amd64
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+  build-arm64:
+    needs: test-amd64
+    runs-on: [self-hosted, linux, x64]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #     - name: Setup QEMU
-  #       uses: docker/setup-qemu-action@v3
-  #       with:
-  #         platforms: arm64
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
 
-  #     - name: Build snap
-  #       uses: diddlesnaps/snapcraft-multiarch-action@v1
-  #       id: build
-  #       with:
-  #         architecture: arm64
+      - name: Build snap
+        uses: diddlesnaps/snapcraft-multiarch-action@v1
+        id: build
+        with:
+          architecture: arm64
 
-  #     - name: Upload artifact
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: ${{ env.SNAP_ARM64 }}
-  #         path: ${{ steps.build.outputs.snap }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.SNAP_ARM64 }}
+          path: ${{ steps.build.outputs.snap }}
 
-  # publish-arm64:
-  #   needs: [build-arm64]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Download locally built snap
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: ${{ env.SNAP_AMD64 }}
+  publish-arm64:
+    needs: [build-arm64]
+    runs-on: [self-hosted, linux, x64]
+    steps:
+      - name: Download locally built snap
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.SNAP_AMD64 }}
 
-  #     - uses: snapcore/action-publish@v1
-  #       env:
-  #         SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
-  #       with:
-  #         snap: ${{ needs.build-arm64.outputs.snap }}
-  #         release: edge/ieng-1057
+      - uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+        with:
+          snap: ${{ needs.build-arm64.outputs.snap }}
+          release: edge/ieng-1057
