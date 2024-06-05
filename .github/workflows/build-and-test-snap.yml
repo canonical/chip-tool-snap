@@ -34,13 +34,17 @@ jobs:
 
   build:
     # fake build
+    outputs:
+      snap: ${{ steps.snapcraft.outputs.snap }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Build snap
-        run: echo "test" > chip-tool_00509948+snap_amd64.snap
+        run: |
+          echo "test" > chip-tool_00509948+snap_amd64.snap
+          echo "snap=chip-tool_00509948+snap_amd64.snap" >> "$GITHUB_ENV"
         id: snapcraft
 
       - name: Upload artifact
@@ -120,14 +124,15 @@ jobs:
         with:
           name: ${{ env.SNAP_AMD64 }}
 
-      - name: list
-        run: |
-          FILE_NAME=$(ls chip-tool_*+snap_amd64.snap | head -n 1)
-          echo "artifact_file_name=$FILE_NAME" >> "$GITHUB_ENV"
+      # - name: list
+      #   id: get-file-name
+      #   run: |
+      #     FILE_NAME=$(ls chip-tool_*+snap_amd64.snap | head -n 1)
+      #     echo "ARTIFACT_FILE_NAME=$FILE_NAME" >> "$GITHUB_ENV"
 
       - uses: snapcore/action-publish@v1
         with:
           store_login: ${{ secrets.STORE_LOGIN }}
           # snap: ${{ env.SNAP_AMD64 }}
-          snap: $artifact_file_name
+          snap: ${{ needs.build.outputs.snap }}
           release: edge/ieng-1057
