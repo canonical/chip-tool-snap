@@ -23,13 +23,13 @@ parts:
     build-environment:
       - TAG: master
     override-pull: |
-      # shallow clone the project its submodules
+      # shallow clone the project and its submodules
       git clone https://github.com/project-chip/connectedhomeip.git --depth=1 --branch=$TAG .
       scripts/checkout_submodules.py --shallow --platform linux
       
-      # set the snap version
-      GIT_HASH=$(git rev-parse --short HEAD)
-      craftctl set version=$GIT_HASH+snap
+      # set the snap version to the upstream tag, or fall back to the commit hash
+      UPSTREAM_VERSION=$(git describe --exact-match --tags 2> /dev/null || git rev-parse --short HEAD)
+      craftctl set version=$UPSTREAM_VERSION
       
   chip-tool:
     after: [connectedhomeip]
