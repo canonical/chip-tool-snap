@@ -93,7 +93,7 @@ jobs:
   #         path: ${{ steps.build.outputs.snap }}
 
   publish-snap:
-    needs: build
+    # needs: build
     runs-on: ubuntu-latest
     steps:
       
