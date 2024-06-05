@@ -51,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.SNAP_AMD64 }}
-          path: steps.snapcraft.outputs.snap
+          path: ${{ steps.snapcraft.outputs.snap }}
           if-no-files-found: error
           
   # test:
