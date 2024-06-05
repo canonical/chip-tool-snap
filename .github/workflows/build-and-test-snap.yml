@@ -13,23 +13,41 @@ env:
   SNAP_ARM64: chip-tool_${{ github.run_number}}_arm64.snap
 
 jobs:
+  # build:
+  #   outputs:
+  #     snap: ${{ steps.snapcraft.outputs.snap }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     - name: Build snap
+  #       uses: snapcore/action-build@v1
+  #       id: snapcraft
+
+  #     - name: Upload artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: ${{ env.SNAP_AMD64 }}
+  #         path: ${{ steps.snapcraft.outputs.snap }}
+  #         if-no-files-found: error
+
   build:
-    outputs:
-      snap: ${{ steps.snapcraft.outputs.snap }}
+    # fake build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Build snap
-        uses: snapcore/action-build@v1
+        run: echo "test" > chip-tool_00509948+snap_amd64.snap
         id: snapcraft
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.SNAP_AMD64 }}
-          path: ${{ steps.snapcraft.outputs.snap }}
+          path: chip-tool_00509948+snap_amd64.snap
           if-no-files-found: error
           
   # test:
@@ -103,11 +121,13 @@ jobs:
           name: ${{ env.SNAP_AMD64 }}
 
       - name: list
-        run: ls -lah
+        run: |
+          FILE_NAME=$(ls chip-tool_*+snap_amd64.snap | head -n 1)
+          echo "artifact_file_name=$FILE_NAME" >> "$GITHUB_ENV"
 
       - uses: snapcore/action-publish@v1
         with:
           store_login: ${{ secrets.STORE_LOGIN }}
           # snap: ${{ env.SNAP_AMD64 }}
-          snap: chip-tool_*_amd64.snap
+          snap: $artifact_file_name
           release: edge/ieng-1057
