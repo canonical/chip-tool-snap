@@ -16,7 +16,7 @@ jobs:
   build-amd64:
     outputs:
       snap: ${{ steps.snapcraft.outputs.snap }}
-    runs-on: [self-hosted, linux, x64]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
           
   test-amd64:
     needs: build-amd64
-    runs-on: [self-hosted, linux, x64]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -70,7 +70,7 @@ jobs:
 
   publish-amd64:
     needs: [build-amd64, test-amd64]
-    runs-on: [self-hosted, linux, x64]
+    runs-on: ubuntu-latest
     steps:
       - name: Download locally built snap
         uses: actions/download-artifact@v4
@@ -86,7 +86,7 @@ jobs:
 
   build-arm64:
     needs: test-amd64
-    runs-on: [self-hosted, linux, x64]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -110,7 +110,7 @@ jobs:
 
   publish-arm64:
     needs: [build-arm64]
-    runs-on: [self-hosted, linux, x64]
+    runs-on: ubuntu-latest
     steps:
       - name: Download locally built snap
         uses: actions/download-artifact@v4
