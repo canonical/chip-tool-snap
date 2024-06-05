@@ -28,7 +28,8 @@ parts:
       scripts/checkout_submodules.py --shallow --platform linux
       
       # set the snap version
-      craftctl set version=$TAG+snap
+      GIT_HASH=$(git rev-parse --short HEAD)
+      craftctl set version=$GIT_HASH+snap
       
   chip-tool:
     after: [connectedhomeip]
