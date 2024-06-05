@@ -133,7 +133,8 @@ jobs:
           cat $FILENAME
 
       - uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
         with:
-          store_login: ${{ secrets.STORE_LOGIN }}
           snap: ${{ needs.build.outputs.snap }}
           release: edge/ieng-1057
