@@ -109,5 +109,6 @@ jobs:
       - uses: snapcore/action-publish@v1
         with:
           store_login: ${{ secrets.STORE_LOGIN }}
-          snap: ${{ env.SNAP_AMD64 }}
+          # snap: ${{ env.SNAP_AMD64 }}
+          snap: chip-tool_*_amd64.snap
           release: edge/ieng-1057
