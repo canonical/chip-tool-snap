@@ -44,14 +44,14 @@ jobs:
       - name: Build snap
         run: |
           echo "test" > chip-tool_00509948+snap_amd64.snap
-          echo "snap=chip-tool_00509948+snap_amd64.snap" >> "$GITHUB_ENV"
+          echo "snap=chip-tool_00509948+snap_amd64.snap" >> "$GITHUB_OUTPUT"
         id: snapcraft
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.SNAP_AMD64 }}
-          path: chip-tool_00509948+snap_amd64.snap
+          path: steps.snapcraft.outputs.snap
           if-no-files-found: error
           
   # test:
