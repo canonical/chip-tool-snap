@@ -88,7 +88,7 @@ jobs:
     # We do not start the long running arm64 build unless the amd64 tests have passed.
     needs: test-amd64
     outputs:
-      snap: ${{ steps.snapcraft.outputs.snap }}
+      snap: ${{ steps.build.outputs.snap }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
