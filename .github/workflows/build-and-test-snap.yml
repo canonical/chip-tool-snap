@@ -23,6 +23,9 @@ jobs:
 
       - name: Build snap
         uses: snapcore/action-build@v1
+        with:
+          snapcraft-channel: latest/beta
+          snapcraft-args: --enable-experimental-plugins
         id: snapcraft
 
       - name: Upload artifact
@@ -85,6 +88,8 @@ jobs:
         id: build
         with:
           architecture: arm64
+          snapcraft-channel: latest/beta
+          snapcraft-args: --enable-experimental-plugins
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
