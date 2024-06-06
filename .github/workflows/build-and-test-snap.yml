@@ -88,7 +88,7 @@ jobs:
     # We do not start the long running arm64 build unless the amd64 tests have passed.
     needs: test-amd64
     outputs:
-      snap: ${{ steps.build.outputs.snap }}
+      snap: ${{ steps.snapcraft.outputs.snap }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -101,7 +101,7 @@ jobs:
 
       - name: Build snap
         uses: diddlesnaps/snapcraft-multiarch-action@v1
-        id: build
+        id: snapcraft
         with:
           architecture: arm64
 
@@ -109,7 +109,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT_ARM64 }}
-          path: ${{ steps.build.outputs.snap }}
+          path: ${{ steps.snapcraft.outputs.snap }}
 
   publish-arm64:
     needs: [build-arm64]
