@@ -9,8 +9,8 @@ on:
   workflow_dispatch:
 
 env:
-  SNAP_AMD64: chip-tool_${{ github.run_number}}_amd64.snap
-  SNAP_ARM64: chip-tool_${{ github.run_number}}_arm64.snap
+  ARTIFACT_AMD64: chip-tool_${{ github.run_number}}_amd64
+  ARTIFACT_ARM64: chip-tool_${{ github.run_number}}_arm64
 
 jobs:
   build-amd64:
@@ -28,7 +28,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.SNAP_AMD64 }}
+          name: ${{ env.ARTIFACT_AMD64 }}
           path: ${{ steps.snapcraft.outputs.snap }}
           if-no-files-found: error
           
@@ -44,7 +44,7 @@ jobs:
       - name: Download locally built snap
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.SNAP_AMD64 }}
+          name: ${{ env.ARTIFACT_AMD64 }}
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -75,7 +75,7 @@ jobs:
       - name: Download locally built snap
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.SNAP_AMD64 }}
+          name: ${{ env.ARTIFACT_AMD64 }}
 
       - uses: snapcore/action-publish@v1
         env:
@@ -108,7 +108,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.SNAP_ARM64 }}
+          name: ${{ env.ARTIFACT_ARM64 }}
           path: ${{ steps.build.outputs.snap }}
 
   publish-arm64:
@@ -118,7 +118,7 @@ jobs:
       - name: Download locally built snap
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.SNAP_AMD64 }}
+          name: ${{ env.ARTIFACT_ARM64 }}
 
       - uses: snapcore/action-publish@v1
         env:
