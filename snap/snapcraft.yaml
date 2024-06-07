@@ -21,16 +21,16 @@ parts:
   connectedhomeip:
     plugin: nil
     build-environment:
-      - UPSTREAM_TAG: master
-      - PACKAGE_VERSION: snap
+      - BUILD_METADATA: snap
+      - CHIP_TAG: master
     override-pull: |
       # shallow clone the project and its submodules
-      git clone https://github.com/project-chip/connectedhomeip.git --depth=1 --branch=$UPSTREAM_TAG .
+      git clone https://github.com/project-chip/connectedhomeip.git --depth=1 --branch=$CHIP_TAG .
       scripts/checkout_submodules.py --shallow --platform linux
       
       # prefix the snap version with the upstream tag, or fall back to the commit hash
       UPSTREAM_VERSION=$(git describe --exact-match --tags 2> /dev/null || git rev-parse --short HEAD)
-      craftctl set version=$UPSTREAM_VERSION+$PACKAGE_VERSION
+      craftctl set version=$UPSTREAM_VERSION+$BUILD_METADATA
 
   chip-tool:
     after: [connectedhomeip]
