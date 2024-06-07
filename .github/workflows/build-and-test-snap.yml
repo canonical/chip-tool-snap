@@ -71,6 +71,8 @@ jobs:
           path: tests/*.log
 
   publish-amd64:
+    # Only publish if we are on the main branch
+    if: github.ref == 'refs/heads/main'
     needs: [build-amd64, test-amd64]
     runs-on: ubuntu-latest
     steps:
@@ -84,7 +86,7 @@ jobs:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
         with:
           snap: ${{ needs.build-amd64.outputs.snap }}
-          release: edge/ieng-1057
+          release: latest/edge
 
   build-arm64:
     # We do not start the long running arm64 build unless the amd64 tests have passed.
@@ -114,6 +116,8 @@ jobs:
           path: ${{ steps.snapcraft.outputs.snap }}
 
   publish-arm64:
+    # Only publish if we are on the main branch
+    if: github.ref == 'refs/heads/main'
     needs: [build-arm64]
     runs-on: ubuntu-latest
     steps:
@@ -127,4 +131,4 @@ jobs:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
         with:
           snap: ${{ needs.build-arm64.outputs.snap }}
-          release: edge/ieng-1057
+          release: latest/edge
