@@ -1,6 +1,8 @@
-name: Snap Tester
+name: Build, test and publish snap
 
 on:
+  schedule:
+    - cron: "20 2 * * 1"  # Monday morning 02:20 UTC
   push:
     branches: [ main ]
   pull_request:
@@ -9,11 +11,11 @@ on:
   workflow_dispatch:
 
 env:
-  SNAP_AMD64: chip-tool_${{ github.run_number}}_amd64.snap
-  SNAP_ARM64: chip-tool_${{ github.run_number}}_arm64.snap
+  ARTIFACT_AMD64: chip-tool_${{ github.run_number}}_amd64
+  ARTIFACT_ARM64: chip-tool_${{ github.run_number}}_arm64
 
 jobs:
-  build:
+  build-amd64:
     outputs:
       snap: ${{ steps.snapcraft.outputs.snap }}
     runs-on: ubuntu-latest
@@ -28,12 +30,12 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.SNAP_AMD64 }}
+          name: ${{ env.ARTIFACT_AMD64 }}
           path: ${{ steps.snapcraft.outputs.snap }}
           if-no-files-found: error
           
-  test:
-    needs: build
+  test-amd64:
+    needs: build-amd64
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -44,7 +46,7 @@ jobs:
       - name: Download locally built snap
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.SNAP_AMD64 }}
+          name: ${{ env.ARTIFACT_AMD64 }}
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -57,7 +59,7 @@ jobs:
         working-directory: tests
         env:
           SKIP_TEARDOWN_REMOVAL: true
-          LOCAL_SERVICE_SNAP: ../chip-tool_*.snap
+          LOCAL_SERVICE_SNAP: ../${{ needs.build-amd64.outputs.snap }}
         run: |
           go test -failfast -p 1 -timeout 30m -v
 
@@ -68,8 +70,29 @@ jobs:
           name: logs
           path: tests/*.log
 
+  publish-amd64:
+    # Only publish if we are on the main branch
+    if: github.ref == 'refs/heads/main'
+    needs: [build-amd64, test-amd64]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download locally built snap
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_AMD64 }}
+
+      - uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+        with:
+          snap: ${{ needs.build-amd64.outputs.snap }}
+          release: latest/edge
+
   build-arm64:
-    needs: test
+    # We do not start the long running arm64 build unless the amd64 tests have passed.
+    needs: test-amd64
+    outputs:
+      snap: ${{ steps.snapcraft.outputs.snap }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -82,12 +105,30 @@ jobs:
 
       - name: Build snap
         uses: diddlesnaps/snapcraft-multiarch-action@v1
-        id: build
+        id: snapcraft
         with:
           architecture: arm64
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.SNAP_ARM64 }}
-          path: ${{ steps.build.outputs.snap }}
+          name: ${{ env.ARTIFACT_ARM64 }}
+          path: ${{ steps.snapcraft.outputs.snap }}
+
+  publish-arm64:
+    # Only publish if we are on the main branch
+    if: github.ref == 'refs/heads/main'
+    needs: [build-arm64]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download locally built snap
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_ARM64 }}
+
+      - uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+        with:
+          snap: ${{ needs.build-arm64.outputs.snap }}
+          release: latest/edge
