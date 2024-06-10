@@ -18,10 +18,7 @@ parts:
     plugin: nil
     source: snap/local
     override-build: |
-      BIN=$SNAPCRAFT_PART_INSTALL/bin
-      mkdir -p $BIN
-      cp -v bin/* $BIN/
-      chmod +x $BIN/*
+      cp -rv bin $SNAPCRAFT_PART_INSTALL/
 
   connectedhomeip:
     plugin: nil
