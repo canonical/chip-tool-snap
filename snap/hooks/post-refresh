@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo "post-refresh hook running"
+
+# This script runs as root, so $SNAP_USER_COMMON is /root/snap/chip-tool/common
+# See https://forum.snapcraft.io/t/snapcraft-hook-support/19069/12
+cp $SNAP_COMMON/mnt/* $SNAP_USER_COMMON/
