@@ -9,8 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const allClusterSnap = "matter-all-clusters-app"
-
 func TestAllClustersAppWiFi(t *testing.T) {
 	InstallChipTool(t)
 
