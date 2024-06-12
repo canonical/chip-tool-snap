@@ -35,7 +35,7 @@ sudo snap connect chip-tool:process-control
 ### Commissioning into IP network
 Discover using DNS-SD and pair:
 ```bash
-sudo chip-tool pairing onnetwork 110 20202021
+chip-tool pairing onnetwork 110 20202021
 ```
 
 where:
@@ -56,7 +56,7 @@ Done
 
 Discover and pair:
 ```bash
-sudo chip-tool pairing ble-thread 110 hex:0e08...f7f8 20202021 3840
+chip-tool pairing ble-thread 110 hex:0e08...f7f8 20202021 3840
 ```
 
 where:
@@ -70,7 +70,7 @@ where:
 ### Control
 Toggle:
 ```bash
-sudo chip-tool onoff toggle 110 1
+chip-tool onoff toggle 110 1
 ```
 
 where:
@@ -122,3 +122,23 @@ Continue the [setup](#setup).
 ## Test
 
 Refer to [tests](./tests).
+
+## Note on sudo
+
+The latest version of the chip-tool snap does not require the use of sudo (root access). If you have updated the snap from a previous version it will still work with sudo. If you run it as a normal user, the previous state of provisioned devices will not be available.
+
+To change from running as sudo to running without sudo, you need to copy the database files from the root user to your user, and update the file ownerships. That can be done with these two commands:
+
+```
+sudo cp /var/snap/chip-tool/common/mnt/chip_tool_* ~/snap/chip-tool/common/
+sudo chown $USER:$USER ~/snap/chip-tool/common/*
+```
+
+If you run chip-tool again without sudo and get an error similar to `CHIP Error 0x000000AF: Write to file failed`, either restart your computer to clear all temporary files, or run the following commands to delete them:
+
+```
+# Open a shell inside the chip-tool snap sandbox
+sudo snap run --shell chip-tool.chip-tool
+# Inside this shell, delete the temporary files
+rm /tmp/chip_*
+```
