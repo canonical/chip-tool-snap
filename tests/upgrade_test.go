@@ -3,7 +3,6 @@ package tests
 import (
 	"github.com/canonical/matter-snap-testing/utils"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"log"
 	"os"
 	"testing"
@@ -13,22 +12,20 @@ import (
 func TestUpgrade(t *testing.T) {
 	start := time.Now()
 
+	// Remove snaps and logs at end of test, even if it failed
+	t.Cleanup(func() {
+		utils.SnapRemove(nil, allClusterSnap)
+		utils.SnapDumpLogs(nil, start, allClusterSnap)
+		utils.SnapRemove(nil, chipToolSnap)
+		utils.SnapDumpLogs(nil, start, chipToolSnap)
+	})
+
 	// Start clean
 	utils.SnapRemove(t, allClusterSnap)
 	utils.SnapRemove(t, chipToolSnap)
 
-	t.Cleanup(func() {
-		utils.SnapRemove(t, allClusterSnap)
-		utils.SnapDumpLogs(nil, start, allClusterSnap)
-	})
-
 	// Install stable chip tool from store
-	require.NoError(t,
-		utils.SnapInstallFromStore(nil, chipToolSnap, "latest/stable"),
-	)
-	t.Cleanup(func() {
-		utils.SnapRemove(t, chipToolSnap)
-	})
+	utils.SnapInstallFromStore(t, chipToolSnap, "latest/stable")
 
 	// Setup chip-tool
 	utils.SnapConnect(t, chipToolSnap+":avahi-observe", "")
@@ -36,12 +33,7 @@ func TestUpgrade(t *testing.T) {
 	utils.SnapConnect(t, chipToolSnap+":process-control", "")
 
 	// Install all clusters app
-	require.NoError(t,
-		utils.SnapInstallFromStore(t, allClusterSnap, utils.ServiceChannel),
-	)
-	t.Cleanup(func() {
-		utils.SnapRemove(t, allClusterSnap)
-	})
+	utils.SnapInstallFromStore(t, allClusterSnap, utils.ServiceChannel)
 
 	// Setup all clusters app
 	utils.SnapSet(t, allClusterSnap, "args", "--wifi")
@@ -62,7 +54,7 @@ func TestUpgrade(t *testing.T) {
 	})
 
 	// Control device
-	t.Run("Control Stable", func(t *testing.T) {
+	t.Run("Control with stable snap", func(t *testing.T) {
 		snapVersion := utils.SnapVersion(t, chipToolSnap)
 		snapRevision := utils.SnapRevision(t, chipToolSnap)
 		log.Printf("%s installed version %s build %s\n", chipToolSnap, snapVersion, snapRevision)
@@ -78,15 +70,13 @@ func TestUpgrade(t *testing.T) {
 
 	// Upgrade chip-tool to local snap or edge
 	if utils.LocalServiceSnap() {
-		require.NoError(t,
-			utils.SnapInstallFromFile(nil, utils.LocalServiceSnapPath),
-		)
+		utils.SnapInstallFromFile(t, utils.LocalServiceSnapPath)
 	} else {
-		utils.SnapRefresh(nil, chipToolSnap, "latest/edge")
+		utils.SnapRefresh(t, chipToolSnap, "latest/edge")
 	}
 
 	// Control device again
-	t.Run("Control Local", func(t *testing.T) {
+	t.Run("Control upgraded snap", func(t *testing.T) {
 		snapVersion := utils.SnapVersion(t, chipToolSnap)
 		snapRevision := utils.SnapRevision(t, chipToolSnap)
 		log.Printf("%s installed version %s build %s\n", chipToolSnap, snapVersion, snapRevision)
