@@ -14,14 +14,14 @@ func TestUpgrade(t *testing.T) {
 
 	// Remove snaps and logs at end of test, even if it failed
 	t.Cleanup(func() {
-		utils.SnapRemove(nil, allClusterSnap)
-		utils.SnapDumpLogs(nil, start, allClusterSnap)
+		utils.SnapRemove(nil, allClustersSnap)
+		utils.SnapDumpLogs(nil, start, allClustersSnap)
 		utils.SnapRemove(nil, chipToolSnap)
 		utils.SnapDumpLogs(nil, start, chipToolSnap)
 	})
 
 	// Start clean
-	utils.SnapRemove(t, allClusterSnap)
+	utils.SnapRemove(t, allClustersSnap)
 	utils.SnapRemove(t, chipToolSnap)
 
 	// Install stable chip tool from store
@@ -33,17 +33,17 @@ func TestUpgrade(t *testing.T) {
 	utils.SnapConnect(t, chipToolSnap+":process-control", "")
 
 	// Install all clusters app
-	utils.SnapInstallFromStore(t, allClusterSnap, utils.ServiceChannel)
+	utils.SnapInstallFromStore(t, allClustersSnap, utils.ServiceChannel)
 
 	// Setup all clusters app
-	utils.SnapSet(t, allClusterSnap, "args", "--wifi")
-	utils.SnapConnect(t, allClusterSnap+":avahi-control", "")
-	utils.SnapConnect(t, allClusterSnap+":bluez", "")
+	utils.SnapSet(t, allClustersSnap, "args", "--wifi")
+	utils.SnapConnect(t, allClustersSnap+":avahi-control", "")
+	utils.SnapConnect(t, allClustersSnap+":bluez", "")
 
 	// Start all clusters app
-	utils.SnapStart(t, allClusterSnap)
+	utils.SnapStart(t, allClustersSnap)
 	utils.WaitForLogMessage(t,
-		allClusterSnap, "CHIP minimal mDNS started advertising", start)
+		allClustersSnap, "CHIP minimal mDNS started advertising", start)
 
 	// Pair device
 	t.Run("Commission", func(t *testing.T) {
@@ -65,7 +65,7 @@ func TestUpgrade(t *testing.T) {
 		)
 
 		utils.WaitForLogMessage(t,
-			allClusterSnap, "CHIP:ZCL: Toggle ep1 on/off", start)
+			allClustersSnap, "CHIP:ZCL: Toggle ep1 on/off", start)
 	})
 
 	// Upgrade chip-tool to local snap or edge
@@ -87,7 +87,7 @@ func TestUpgrade(t *testing.T) {
 		)
 
 		utils.WaitForLogMessage(t,
-			allClusterSnap, "CHIP:ZCL: Toggle ep1 on/off", start)
+			allClustersSnap, "CHIP:ZCL: Toggle ep1 on/off", start)
 	})
 
 }
