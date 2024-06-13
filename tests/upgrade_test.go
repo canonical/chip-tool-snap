@@ -4,16 +4,13 @@ import (
 	"github.com/canonical/matter-snap-testing/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"log"
 	"os"
 	"testing"
 	"time"
 )
 
 func TestUpgrade(t *testing.T) {
-	if !utils.LocalServiceSnap() {
-		t.Skipf("LOCAL_SERVICE_SNAP needs to be defined")
-	}
-
 	start := time.Now()
 
 	// Start clean
@@ -66,10 +63,9 @@ func TestUpgrade(t *testing.T) {
 
 	// Control device
 	t.Run("Control Stable", func(t *testing.T) {
-		err := PrintSnapVersion(t, chipToolSnap)
-		if err != nil {
-			t.Fatalf("snap not installed")
-		}
+		snapVersion := utils.SnapVersion(t, chipToolSnap)
+		snapRevision := utils.SnapRevision(t, chipToolSnap)
+		log.Printf("%s installed version %s build %s\n", chipToolSnap, snapVersion, snapRevision)
 
 		stdout, _, _ := utils.Exec(t, "sudo chip-tool onoff toggle 110 1 2>&1")
 		assert.NoError(t,
@@ -80,17 +76,20 @@ func TestUpgrade(t *testing.T) {
 			allClusterSnap, "CHIP:ZCL: Toggle ep1 on/off", start)
 	})
 
-	// Upgrade chip-tool to local snap
-	require.NoError(t,
-		utils.SnapInstallFromFile(nil, utils.LocalServiceSnapPath),
-	)
+	// Upgrade chip-tool to local snap or edge
+	if utils.LocalServiceSnap() {
+		require.NoError(t,
+			utils.SnapInstallFromFile(nil, utils.LocalServiceSnapPath),
+		)
+	} else {
+		utils.SnapRefresh(nil, chipToolSnap, "latest/edge")
+	}
 
 	// Control device again
 	t.Run("Control Local", func(t *testing.T) {
-		err := PrintSnapVersion(t, chipToolSnap)
-		if err != nil {
-			t.Fatalf("snap not installed")
-		}
+		snapVersion := utils.SnapVersion(t, chipToolSnap)
+		snapRevision := utils.SnapRevision(t, chipToolSnap)
+		log.Printf("%s installed version %s build %s\n", chipToolSnap, snapVersion, snapRevision)
 
 		stdout, _, _ := utils.Exec(t, "sudo chip-tool onoff toggle 110 1 2>&1")
 		assert.NoError(t,
