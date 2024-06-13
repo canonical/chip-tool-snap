@@ -7,8 +7,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const allClusterSnap = "matter-all-clusters-app"
+const chipToolSnap = "chip-tool"
+
 func InstallChipTool(t *testing.T) {
-	const chipToolSnap = "chip-tool"
 
 	// clean
 	utils.SnapRemove(t, chipToolSnap)

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# This script runs as root, so $SNAP_USER_COMMON is /root/snap/chip-tool/common
+# See https://forum.snapcraft.io/t/snapcraft-hook-support/19069/12
+
+if [ -d $SNAP_COMMON/mnt ] && [ -n "$(ls -A $SNAP_COMMON/mnt)" ]; then
+	cp $SNAP_COMMON/mnt/* $SNAP_USER_COMMON/;
+fi
