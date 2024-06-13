@@ -81,6 +81,27 @@ where:
 -   `1` is the endpoint of the configured device
 
 
+### Note on sudo
+
+The latest version of the chip-tool snap does not require the use of sudo (root access). If you have updated the snap from a previous version it will still work with sudo. If you run it as a normal user, the previous state of provisioned devices will not be available.
+
+To change from running with sudo to running without sudo, you need to copy the database files from the root user to your user, and update the file ownerships. This can be done with these two commands:
+
+```
+sudo cp /var/snap/chip-tool/common/mnt/chip_tool_* ~/snap/chip-tool/common/
+sudo chown $USER:$USER ~/snap/chip-tool/common/*
+```
+
+If you run chip-tool again without sudo and get an error similar to `CHIP Error 0x000000AF: Write to file failed`, either restart your computer to clear all temporary files, or run the following commands to delete them:
+
+```
+# Open a shell inside the chip-tool snap sandbox
+sudo snap run --shell chip-tool.chip-tool
+# Inside this shell, delete the temporary files
+rm /tmp/chip_*
+```
+
+
 ## Build
 
 Build locally for the architecture same as the host:
@@ -122,23 +143,3 @@ Continue the [setup](#setup).
 ## Test
 
 Refer to [tests](./tests).
-
-## Note on sudo
-
-The latest version of the chip-tool snap does not require the use of sudo (root access). If you have updated the snap from a previous version it will still work with sudo. If you run it as a normal user, the previous state of provisioned devices will not be available.
-
-To change from running with sudo to running without sudo, you need to copy the database files from the root user to your user, and update the file ownerships. This can be done with these two commands:
-
-```
-sudo cp /var/snap/chip-tool/common/mnt/chip_tool_* ~/snap/chip-tool/common/
-sudo chown $USER:$USER ~/snap/chip-tool/common/*
-```
-
-If you run chip-tool again without sudo and get an error similar to `CHIP Error 0x000000AF: Write to file failed`, either restart your computer to clear all temporary files, or run the following commands to delete them:
-
-```
-# Open a shell inside the chip-tool snap sandbox
-sudo snap run --shell chip-tool.chip-tool
-# Inside this shell, delete the temporary files
-rm /tmp/chip_*
-```
