@@ -15,25 +15,25 @@ func TestAllClustersAppWiFi(t *testing.T) {
 	start := time.Now()
 
 	// Start clean
-	utils.SnapRemove(t, allClusterSnap)
+	utils.SnapRemove(t, allClustersSnap)
 
 	t.Cleanup(func() {
-		utils.SnapRemove(t, allClusterSnap)
-		utils.SnapDumpLogs(nil, start, allClusterSnap)
+		utils.SnapRemove(t, allClustersSnap)
+		utils.SnapDumpLogs(nil, start, allClustersSnap)
 	})
 
 	// Install all clusters app
-	utils.SnapInstallFromStore(t, allClusterSnap, utils.ServiceChannel)
+	utils.SnapInstallFromStore(t, allClustersSnap, utils.ServiceChannel)
 
 	// Setup all clusters app
-	utils.SnapSet(t, allClusterSnap, "args", "--wifi")
-	utils.SnapConnect(t, allClusterSnap+":avahi-control", "")
-	utils.SnapConnect(t, allClusterSnap+":bluez", "")
+	utils.SnapSet(t, allClustersSnap, "args", "--wifi")
+	utils.SnapConnect(t, allClustersSnap+":avahi-control", "")
+	utils.SnapConnect(t, allClustersSnap+":bluez", "")
 
 	// Start all clusters app
-	utils.SnapStart(t, allClusterSnap)
+	utils.SnapStart(t, allClustersSnap)
 	utils.WaitForLogMessage(t,
-		allClusterSnap, "CHIP minimal mDNS started advertising", start)
+		allClustersSnap, "CHIP minimal mDNS started advertising", start)
 
 	t.Run("Commission", func(t *testing.T) {
 		stdout, _, _ := utils.Exec(t, "sudo chip-tool pairing onnetwork 110 20202021 2>&1")
@@ -49,7 +49,7 @@ func TestAllClustersAppWiFi(t *testing.T) {
 		)
 
 		utils.WaitForLogMessage(t,
-			allClusterSnap, "CHIP:ZCL: Toggle ep1 on/off", start)
+			allClustersSnap, "CHIP:ZCL: Toggle ep1 on/off", start)
 	})
 
 }
