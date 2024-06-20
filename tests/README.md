@@ -34,12 +34,12 @@ go test -v -failfast -count 1 ./thread_tests
 
 ### Thread specific environment variables
 
- Variable name    | Required | Default value                   | Description                       
-------------------|----------|---------------------------------|-----------------------------------
- LOCAL_INFRA_IF   | no       | wlan0                           | wlan0                             | Local backhaul network interface  
- LOCAL_RADIO_URL  | no       | spinel+hdlc+uart:///dev/ttyACM0 | Local RCP serial port             
- REMOTE_HOST      | yes      |                                 | Remote device IP or hostname      
- REMOTE_USER      | yes      |                                 | Remote device SSH username        
- REMOTE_PASSWORD  | yes      |                                 | Remote device SSH password        
- REMOTE_INFRA_IF  | no       | wlan0                           | Remote backhaul network interface 
- REMOTE_RADIO_URL | no       | spinel+hdlc+uart:///dev/ttyACM0 | Remote RCP serial port            
+| Variable name    | Required | Default value                   | Description                       |
+|------------------|----------|---------------------------------|-----------------------------------|
+| LOCAL_INFRA_IF   | no       | wlan0                           | Local backhaul network interface  |
+| LOCAL_RADIO_URL  | no       | spinel+hdlc+uart:///dev/ttyACM0 | Local RCP URL                     |
+| REMOTE_HOST      | yes      |                                 | Remote device IP or hostname      |
+| REMOTE_USER      | yes      |                                 | Remote device SSH username        |
+| REMOTE_PASSWORD  | yes      |                                 | Remote device SSH password        |
+| REMOTE_INFRA_IF  | no       | wlan0                           | Remote backhaul network interface |
+| REMOTE_RADIO_URL | no       | spinel+hdlc+uart:///dev/ttyACM0 | Remote RCP URL                    |
