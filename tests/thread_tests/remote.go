@@ -15,7 +15,8 @@ var (
 	remoteUser           = ""
 	remotePassword       = ""
 	remoteHost           = ""
-	remoteInfraInterface = ""
+	remoteInfraInterface = defaultInfraInterfaceValue
+	remoteRadioUrl       = defaultRadioUrl
 
 	SSHClient *ssh.Client
 )
@@ -31,12 +32,6 @@ func remote_setup(t *testing.T) {
 }
 
 func remote_loadEnvVars() {
-	const (
-		remoteUserEnv           = "REMOTE_USER"
-		remotePasswordEnv       = "REMOTE_PASSWORD"
-		remoteHostEnv           = "REMOTE_HOST"
-		remoteInfraInterfaceEnv = "REMOTE_INFRA_IF"
-	)
 
 	if v := os.Getenv(remoteUserEnv); v != "" {
 		remoteUser = v
@@ -52,6 +47,10 @@ func remote_loadEnvVars() {
 
 	if v := os.Getenv(remoteInfraInterfaceEnv); v != "" {
 		remoteInfraInterface = v
+	}
+
+	if v := os.Getenv(remoteRadioUrlEnv); v != "" {
+		remoteRadioUrl = v
 	}
 }
 
@@ -93,7 +92,8 @@ func remote_deployOTBRAgent(t *testing.T) {
 	commands := []string{
 		"sudo snap remove --purge openthread-border-router",
 		"sudo snap install openthread-border-router --edge",
-		"sudo snap set openthread-border-router infra-if='" + remoteInfraInterface + "'",
+		fmt.Sprintf("sudo snap set openthread-border-router %s='%s'", infraInterfaceKey, remoteInfraInterface),
+		fmt.Sprintf("sudo snap set openthread-border-router %s='%s'", radioUrlKey, remoteRadioUrl),
 		// "sudo snap connect openthread-border-router:avahi-control",
 		"sudo snap connect openthread-border-router:firewall-control",
 		"sudo snap connect openthread-border-router:raw-usb",
