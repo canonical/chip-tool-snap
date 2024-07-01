@@ -36,14 +36,14 @@ func TestAllClustersAppWiFi(t *testing.T) {
 		allClustersSnap, "CHIP minimal mDNS started advertising", start)
 
 	t.Run("Commission", func(t *testing.T) {
-		stdout, _, _ := utils.Exec(t, "sudo chip-tool pairing onnetwork 110 20202021 2>&1")
+		stdout, _, _ := utils.Exec(t, "chip-tool pairing onnetwork 110 20202021 2>&1")
 		assert.NoError(t,
 			os.WriteFile("chip-tool-pairing.log", []byte(stdout), 0644),
 		)
 	})
 
 	t.Run("Control", func(t *testing.T) {
-		stdout, _, _ := utils.Exec(t, "sudo chip-tool onoff toggle 110 1 2>&1")
+		stdout, _, _ := utils.Exec(t, "chip-tool onoff toggle 110 1 2>&1")
 		assert.NoError(t,
 			os.WriteFile("chip-tool-onoff.log", []byte(stdout), 0644),
 		)
