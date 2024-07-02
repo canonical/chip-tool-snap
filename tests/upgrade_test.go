@@ -1,12 +1,13 @@
 package tests
 
 import (
-	"github.com/canonical/matter-snap-testing/utils"
-	"github.com/stretchr/testify/assert"
 	"log"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/canonical/matter-snap-testing/utils"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestUpgrade(t *testing.T) {
@@ -49,7 +50,7 @@ func TestUpgrade(t *testing.T) {
 	t.Run("Commission", func(t *testing.T) {
 		stdout, _, _ := utils.Exec(t, "sudo chip-tool pairing onnetwork 110 20202021 2>&1")
 		assert.NoError(t,
-			os.WriteFile("chip-tool-pairing.log", []byte(stdout), 0644),
+			os.WriteFile(t.Name()+"-chip-tool-pairing.log", []byte(stdout), 0644),
 		)
 	})
 
@@ -59,9 +60,10 @@ func TestUpgrade(t *testing.T) {
 		snapRevision := utils.SnapRevision(t, chipToolSnap)
 		log.Printf("%s installed version %s build %s\n", chipToolSnap, snapVersion, snapRevision)
 
+		start := time.Now()
 		stdout, _, _ := utils.Exec(t, "sudo chip-tool onoff toggle 110 1 2>&1")
 		assert.NoError(t,
-			os.WriteFile("chip-tool-onoff.log", []byte(stdout), 0644),
+			os.WriteFile(t.Name()+"-chip-tool-onoff.log", []byte(stdout), 0644),
 		)
 
 		utils.WaitForLogMessage(t,
@@ -69,11 +71,13 @@ func TestUpgrade(t *testing.T) {
 	})
 
 	// Upgrade chip-tool to local snap or edge
-	if utils.LocalServiceSnap() {
-		utils.SnapInstallFromFile(t, utils.LocalServiceSnapPath)
-	} else {
-		utils.SnapRefresh(t, chipToolSnap, "latest/edge")
-	}
+	t.Run("Refresh snap", func(t *testing.T) {
+		if utils.LocalServiceSnap() {
+			utils.SnapInstallFromFile(t, utils.LocalServiceSnapPath)
+		} else {
+			utils.SnapRefresh(t, chipToolSnap, "latest/edge")
+		}
+	})
 
 	// Control device again
 	t.Run("Control upgraded snap", func(t *testing.T) {
@@ -81,9 +85,10 @@ func TestUpgrade(t *testing.T) {
 		snapRevision := utils.SnapRevision(t, chipToolSnap)
 		log.Printf("%s installed version %s build %s\n", chipToolSnap, snapVersion, snapRevision)
 
+		start := time.Now()
 		stdout, _, _ := utils.Exec(t, "sudo chip-tool onoff toggle 110 1 2>&1")
 		assert.NoError(t,
-			os.WriteFile("chip-tool-onoff.log", []byte(stdout), 0644),
+			os.WriteFile(t.Name()+"-chip-tool-onoff.log", []byte(stdout), 0644),
 		)
 
 		utils.WaitForLogMessage(t,
