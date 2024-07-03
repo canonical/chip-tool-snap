@@ -14,8 +14,8 @@ func TestUpgrade(t *testing.T) {
 	t.Cleanup(func() {
 		utils.SnapRemove(nil, allClustersSnap)
 		utils.SnapDumpLogs(nil, start, allClustersSnap)
+
 		utils.SnapRemove(nil, chipToolSnap)
-		utils.SnapDumpLogs(nil, start, chipToolSnap)
 	})
 
 	// Start clean
