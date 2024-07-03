@@ -39,10 +39,9 @@ func TestAllClustersAppWiFi(t *testing.T) {
 	})
 
 	t.Run("Control", func(t *testing.T) {
-		// stdbuf --output=L sets the output stream to line buffered
-		stdout, _, _ := utils.Exec(t, "stdbuf --output=L sudo chip-tool onoff toggle 110 1 2>&1")
-
-		writeLogFile(t, "chip-tool-onoff", []byte(stdout))
+		// stdbuf --output=0 sets the output stream to unbuffered
+		stdout, _, _ := utils.Exec(t, "stdbuf --output=0 sudo chip-tool onoff toggle 110 1 2>&1")
+		writeLogFile(t, "chip-tool-toggle", []byte(stdout))
 
 		utils.WaitForLogMessage(t,
 			allClustersSnap, "Toggle ep1 on/off", start)
