@@ -39,12 +39,13 @@ func TestAllClustersAppWiFi(t *testing.T) {
 	})
 
 	t.Run("Control", func(t *testing.T) {
-		// stdbuf --output=0 sets the output stream to unbuffered
-		stdout, _, _ := utils.Exec(t, "stdbuf --output=0 sudo chip-tool onoff toggle 110 1 2>&1")
+		stdout, _, _ := utils.Exec(t, "sudo chip-tool onoff toggle 110 1 2>&1")
 		writeLogFile(t, "chip-tool-toggle", []byte(stdout))
 
-		utils.WaitForLogMessage(t,
-			allClustersSnap, "Toggle ep1 on/off", start)
+		// 0x6 is the cluster ID for on-off
+		// Using cluster ID here because of a buffering issue in the log stream:
+		// https://github.com/canonical/chip-tool-snap/pull/69#issuecomment-2207189962
+		utils.WaitForLogMessage(t, allClustersSnap, "ClusterId = 0x6", start)
 	})
 
 }
