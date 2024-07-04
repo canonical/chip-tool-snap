@@ -119,12 +119,12 @@ func remote_deployAllClustersApp(t *testing.T) {
 	start := time.Now().UTC()
 
 	commands := []string{
-		"sudo apt install -y bluez",
+		// "sudo apt install -y bluez",
 		"sudo snap remove --purge matter-all-clusters-app",
 		"sudo snap install matter-all-clusters-app --edge",
 		"sudo snap set matter-all-clusters-app args='--thread'",
 		"sudo snap connect matter-all-clusters-app:avahi-control",
-		"sudo snap connect matter-all-clusters-app:bluez",
+		// "sudo snap connect matter-all-clusters-app:bluez",
 		"sudo snap connect matter-all-clusters-app:otbr-dbus-wpan0 openthread-border-router:dbus-wpan0",
 		"sudo snap start matter-all-clusters-app",
 	}
