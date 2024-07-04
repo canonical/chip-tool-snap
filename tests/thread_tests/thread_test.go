@@ -30,7 +30,10 @@ func TestAllClustersAppThread(t *testing.T) {
 			os.WriteFile("chip-tool-thread-onoff.log", []byte(stdout), 0644),
 		)
 
-		remote_waitForLogMessage(t, "matter-all-clusters-app", "CHIP:ZCL: Toggle ep1 on/off", start)
+		// 0x6 is the Matter Cluster ID for on-off
+		// Using cluster ID here because of a buffering issue in the log stream:
+		// https://github.com/canonical/chip-tool-snap/pull/69#issuecomment-2209530275
+		remote_waitForLogMessage(t, "matter-all-clusters-app", "ClusterId = 0x6", start)
 	})
 
 }
