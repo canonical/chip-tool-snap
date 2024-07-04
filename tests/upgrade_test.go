@@ -57,7 +57,7 @@ func TestUpgrade(t *testing.T) {
 		stdout, _, _ := utils.Exec(t, "sudo chip-tool onoff on 110 1 2>&1")
 		writeLogFile(t, "chip-tool-onoff", []byte(stdout))
 
-		waitForOnOffHandingByAllClustersApp(t, start)
+		waitForOnOffHandlingByAllClustersApp(t, start)
 	})
 
 	t.Run("Upgrade snap", func(t *testing.T) {
@@ -77,7 +77,7 @@ func TestUpgrade(t *testing.T) {
 		stdout, _, _ := utils.Exec(t, "sudo chip-tool onoff off 110 1 2>&1")
 		writeLogFile(t, "chip-tool-onoff", []byte(stdout))
 
-		waitForOnOffHandingByAllClustersApp(t, start)
+		waitForOnOffHandlingByAllClustersApp(t, start)
 	})
 
 }

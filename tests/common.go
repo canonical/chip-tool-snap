@@ -44,7 +44,7 @@ func writeLogFile(t *testing.T, label string, b []byte) {
 	)
 }
 
-func waitForOnOffHandingByAllClustersApp(t *testing.T, start time.Time) {
+func waitForOnOffHandlingByAllClustersApp(t *testing.T, start time.Time) {
 	// 0x6 is the Matter Cluster ID for on-off
 	// Using cluster ID here because of a buffering issue in the log stream:
 	// https://github.com/canonical/chip-tool-snap/pull/69#issuecomment-2207189962

@@ -42,7 +42,7 @@ func TestAllClustersAppWiFi(t *testing.T) {
 		stdout, _, _ := utils.Exec(t, "sudo chip-tool onoff toggle 110 1 2>&1")
 		writeLogFile(t, "chip-tool-toggle", []byte(stdout))
 
-		waitForOnOffHandingByAllClustersApp(t, start)
+		waitForOnOffHandlingByAllClustersApp(t, start)
 	})
 
 }
