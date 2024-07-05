@@ -1,9 +1,13 @@
 package tests
 
 import (
+	"os"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/canonical/matter-snap-testing/utils"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -32,4 +36,17 @@ func InstallChipTool(t *testing.T) {
 	utils.SnapConnect(t, chipToolSnap+":avahi-observe", "")
 	utils.SnapConnect(t, chipToolSnap+":bluez", "")
 	utils.SnapConnect(t, chipToolSnap+":process-control", "")
+}
+
+func writeLogFile(t *testing.T, label string, b []byte) {
+	assert.NoError(t,
+		os.WriteFile(strings.ReplaceAll(t.Name(), "/", "-")+"-"+label+".log", b, 0644),
+	)
+}
+
+func waitForOnOffHandlingByAllClustersApp(t *testing.T, start time.Time) {
+	// 0x6 is the Matter Cluster ID for on-off
+	// Using cluster ID here because of a buffering issue in the log stream:
+	// https://github.com/canonical/chip-tool-snap/pull/69#issuecomment-2207189962
+	utils.WaitForLogMessage(t, allClustersSnap, "ClusterId = 0x6", start)
 }

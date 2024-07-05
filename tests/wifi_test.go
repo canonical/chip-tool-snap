@@ -1,12 +1,10 @@
 package tests
 
 import (
-	"os"
 	"testing"
 	"time"
 
 	"github.com/canonical/matter-snap-testing/utils"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestAllClustersAppWiFi(t *testing.T) {
@@ -19,11 +17,11 @@ func TestAllClustersAppWiFi(t *testing.T) {
 
 	t.Cleanup(func() {
 		utils.SnapRemove(t, allClustersSnap)
-		utils.SnapDumpLogs(nil, start, allClustersSnap)
+		utils.SnapDumpLogs(t, start, allClustersSnap)
 	})
 
 	// Install all clusters app
-	utils.SnapInstallFromStore(t, allClustersSnap, utils.ServiceChannel)
+	utils.SnapInstallFromStore(t, allClustersSnap, "latest/edge")
 
 	// Setup all clusters app
 	utils.SnapSet(t, allClustersSnap, "args", "--wifi")
@@ -37,19 +35,14 @@ func TestAllClustersAppWiFi(t *testing.T) {
 
 	t.Run("Commission", func(t *testing.T) {
 		stdout, _, _ := utils.Exec(t, "sudo chip-tool pairing onnetwork 110 20202021 2>&1")
-		assert.NoError(t,
-			os.WriteFile("chip-tool-pairing.log", []byte(stdout), 0644),
-		)
+		writeLogFile(t, "chip-tool-pairing", []byte(stdout))
 	})
 
 	t.Run("Control", func(t *testing.T) {
 		stdout, _, _ := utils.Exec(t, "sudo chip-tool onoff toggle 110 1 2>&1")
-		assert.NoError(t,
-			os.WriteFile("chip-tool-onoff.log", []byte(stdout), 0644),
-		)
+		writeLogFile(t, "chip-tool-toggle", []byte(stdout))
 
-		utils.WaitForLogMessage(t,
-			allClustersSnap, "CHIP:ZCL: Toggle ep1 on/off", start)
+		waitForOnOffHandlingByAllClustersApp(t, start)
 	})
 
 }
