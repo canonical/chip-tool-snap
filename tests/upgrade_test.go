@@ -44,7 +44,7 @@ func TestUpgrade(t *testing.T) {
 		allClustersSnap, "CHIP minimal mDNS started advertising", start)
 
 	t.Run("Commission", func(t *testing.T) {
-		stdout, _, _ := utils.Exec(t, "sudo chip-tool pairing onnetwork 110 20202021 2>&1")
+		stdout, _, _ := utils.Exec(t, "chip-tool pairing onnetwork 110 20202021 2>&1")
 		writeLogFile(t, "chip-tool-pairing", []byte(stdout))
 	})
 
@@ -54,7 +54,7 @@ func TestUpgrade(t *testing.T) {
 		log.Printf("%s installed version %s build %s\n", chipToolSnap, snapVersion, snapRevision)
 
 		start := time.Now()
-		stdout, _, _ := utils.Exec(t, "sudo chip-tool onoff on 110 1 2>&1")
+		stdout, _, _ := utils.Exec(t, "chip-tool onoff on 110 1 2>&1")
 		writeLogFile(t, "chip-tool-onoff", []byte(stdout))
 
 		waitForOnOffHandlingByAllClustersApp(t, start)
@@ -74,7 +74,7 @@ func TestUpgrade(t *testing.T) {
 		log.Printf("%s installed version %s build %s\n", chipToolSnap, snapVersion, snapRevision)
 
 		start := time.Now()
-		stdout, _, _ := utils.Exec(t, "sudo chip-tool onoff off 110 1 2>&1")
+		stdout, _, _ := utils.Exec(t, "chip-tool onoff off 110 1 2>&1")
 		writeLogFile(t, "chip-tool-onoff", []byte(stdout))
 
 		waitForOnOffHandlingByAllClustersApp(t, start)
