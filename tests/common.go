@@ -1,12 +1,12 @@
 package tests
 
 import (
-	"github.com/canonical/matter-snap-testing/env"
 	"os"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/canonical/matter-snap-testing/env"
 	"github.com/canonical/matter-snap-testing/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
