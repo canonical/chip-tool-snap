@@ -1,9 +1,11 @@
 module chip-tool-snap-tests
 
-go 1.21.6
+go 1.22.1
+
+toolchain go1.22.5
 
 require (
-	github.com/canonical/matter-snap-testing v1.0.0-beta.3
+	github.com/canonical/matter-snap-testing v1.0.0-beta.4
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/crypto v0.25.0
 )

@@ -1,11 +1,11 @@
 package tests
 
 import (
-	"github.com/canonical/matter-snap-testing/env"
 	"log"
 	"testing"
 	"time"
 
+	"github.com/canonical/matter-snap-testing/env"
 	"github.com/canonical/matter-snap-testing/utils"
 )
 
