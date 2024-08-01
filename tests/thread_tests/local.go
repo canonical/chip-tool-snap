@@ -2,15 +2,15 @@ package thread_tests
 
 import (
 	"fmt"
-	"github.com/canonical/matter-snap-testing/env"
 	"os"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/canonical/matter-snap-testing/utils"
-
 	tests "chip-tool-snap-tests"
+
+	"github.com/canonical/matter-snap-testing/env"
+	"github.com/canonical/matter-snap-testing/utils"
 )
 
 func setup(t *testing.T) {
