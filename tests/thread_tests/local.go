@@ -7,9 +7,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/canonical/matter-snap-testing/utils"
-
 	tests "chip-tool-snap-tests"
+
+	"github.com/canonical/matter-snap-testing/env"
+	"github.com/canonical/matter-snap-testing/utils"
 )
 
 func setup(t *testing.T) {
@@ -19,7 +20,7 @@ func setup(t *testing.T) {
 	utils.SnapRemove(t, otbrSnap)
 
 	// Install OTBR
-	utils.SnapInstallFromStore(t, otbrSnap, utils.ServiceChannel)
+	utils.SnapInstallFromStore(t, otbrSnap, env.SnapChannel())
 	t.Cleanup(func() {
 		utils.SnapRemove(t, otbrSnap)
 	})
