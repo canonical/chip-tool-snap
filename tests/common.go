@@ -1,14 +1,11 @@
 package tests
 
 import (
-	"os"
-	"strings"
 	"testing"
 	"time"
 
 	"github.com/canonical/matter-snap-testing/env"
 	"github.com/canonical/matter-snap-testing/utils"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -37,12 +34,6 @@ func InstallChipTool(t *testing.T) {
 	utils.SnapConnect(t, chipToolSnap+":avahi-observe", "")
 	utils.SnapConnect(t, chipToolSnap+":bluez", "")
 	utils.SnapConnect(t, chipToolSnap+":process-control", "")
-}
-
-func writeLogFile(t *testing.T, label string, b []byte) {
-	assert.NoError(t,
-		os.WriteFile(strings.ReplaceAll(t.Name(), "/", "-")+"-"+label+".log", b, 0644),
-	)
 }
 
 func waitForOnOffHandlingByAllClustersApp(t *testing.T, start time.Time) {

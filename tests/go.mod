@@ -17,3 +17,5 @@ require (
 	golang.org/x/sys v0.22.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/canonical/matter-snap-testing => /home/jpmeijers/matter-snap-testing
