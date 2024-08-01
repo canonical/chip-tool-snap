@@ -2,7 +2,6 @@ package thread_tests
 
 import (
 	"fmt"
-	"github.com/canonical/matter-snap-testing/env"
 	"os"
 	"strings"
 	"testing"
