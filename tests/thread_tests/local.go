@@ -2,6 +2,7 @@ package thread_tests
 
 import (
 	"fmt"
+	"github.com/canonical/matter-snap-testing/env"
 	"os"
 	"strings"
 	"testing"
@@ -19,7 +20,7 @@ func setup(t *testing.T) {
 	utils.SnapRemove(t, otbrSnap)
 
 	// Install OTBR
-	utils.SnapInstallFromStore(t, otbrSnap, utils.ServiceChannel)
+	utils.SnapInstallFromStore(t, otbrSnap, env.SnapChannel())
 	t.Cleanup(func() {
 		utils.SnapRemove(t, otbrSnap)
 	})

@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"github.com/canonical/matter-snap-testing/env"
 	"log"
 	"testing"
 	"time"
@@ -31,7 +32,7 @@ func TestUpgrade(t *testing.T) {
 	utils.SnapConnect(t, chipToolSnap+":process-control", "")
 
 	// Install all clusters app
-	utils.SnapInstallFromStore(t, allClustersSnap, utils.ServiceChannel)
+	utils.SnapInstallFromStore(t, allClustersSnap, env.SnapChannel())
 
 	// Setup all clusters app
 	utils.SnapSet(t, allClustersSnap, "args", "--wifi")
@@ -61,8 +62,8 @@ func TestUpgrade(t *testing.T) {
 	})
 
 	t.Run("Upgrade snap", func(t *testing.T) {
-		if utils.LocalServiceSnap() {
-			utils.SnapInstallFromFile(t, utils.LocalServiceSnapPath)
+		if env.SnapPath() != "" {
+			utils.SnapInstallFromFile(t, env.SnapPath())
 		} else {
 			utils.SnapRefresh(t, chipToolSnap, "latest/edge")
 		}

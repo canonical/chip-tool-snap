@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"github.com/canonical/matter-snap-testing/env"
 	"os"
 	"strings"
 	"testing"
@@ -19,13 +20,13 @@ func InstallChipTool(t *testing.T) {
 	// clean
 	utils.SnapRemove(t, chipToolSnap)
 
-	if utils.LocalServiceSnap() {
+	if env.SnapPath() != "" {
 		require.NoError(t,
-			utils.SnapInstallFromFile(nil, utils.LocalServiceSnapPath),
+			utils.SnapInstallFromFile(nil, env.SnapPath()),
 		)
 	} else {
 		require.NoError(t,
-			utils.SnapInstallFromStore(nil, chipToolSnap, utils.ServiceChannel),
+			utils.SnapInstallFromStore(nil, chipToolSnap, env.SnapChannel()),
 		)
 	}
 	t.Cleanup(func() {
