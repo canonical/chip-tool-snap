@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"github.com/canonical/matter-snap-testing/env"
 	"os"
 	"strings"
 	"testing"
