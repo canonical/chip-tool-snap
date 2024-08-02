@@ -48,7 +48,7 @@ func TestUpgrade(t *testing.T) {
 
 	t.Run("Commission", func(t *testing.T) {
 		stdout, _, _ := utils.Exec(t, "chip-tool pairing onnetwork 110 20202021 2>&1")
-		assert.NoError(t, utils.WriteLogFile(t, "chip-tool-pairing", []byte(stdout)))
+		assert.NoError(t, utils.WriteLogFile(t, "chip-tool-pairing", stdout))
 	})
 
 	t.Run("Control before upgrade", func(t *testing.T) {
@@ -58,7 +58,7 @@ func TestUpgrade(t *testing.T) {
 
 		start := time.Now()
 		stdout, _, _ := utils.Exec(t, "chip-tool onoff on 110 1 2>&1")
-		assert.NoError(t, utils.WriteLogFile(t, "chip-tool-onoff", []byte(stdout)))
+		assert.NoError(t, utils.WriteLogFile(t, "chip-tool-onoff", stdout))
 
 		waitForOnOffHandlingByAllClustersApp(t, start)
 	})
@@ -78,7 +78,7 @@ func TestUpgrade(t *testing.T) {
 
 		start := time.Now()
 		stdout, _, _ := utils.Exec(t, "chip-tool onoff off 110 1 2>&1")
-		assert.NoError(t, utils.WriteLogFile(t, "chip-tool-onoff", []byte(stdout)))
+		assert.NoError(t, utils.WriteLogFile(t, "chip-tool-onoff", stdout))
 
 		waitForOnOffHandlingByAllClustersApp(t, start)
 	})

@@ -36,12 +36,12 @@ func TestAllClustersAppWiFi(t *testing.T) {
 
 	t.Run("Commission", func(t *testing.T) {
 		stdout, _, _ := utils.Exec(t, "chip-tool pairing onnetwork 110 20202021 2>&1")
-		assert.NoError(t, utils.WriteLogFile(t, "chip-tool-pairing", []byte(stdout)))
+		assert.NoError(t, utils.WriteLogFile(t, "chip-tool-pairing", stdout))
 	})
 
 	t.Run("Control", func(t *testing.T) {
 		stdout, _, _ := utils.Exec(t, "chip-tool onoff toggle 110 1 2>&1")
-		assert.NoError(t, utils.WriteLogFile(t, "chip-tool-toggle", []byte(stdout)))
+		assert.NoError(t, utils.WriteLogFile(t, "chip-tool-toggle", stdout))
 
 		waitForOnOffHandlingByAllClustersApp(t, start)
 	})
