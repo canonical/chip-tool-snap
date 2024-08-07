@@ -91,7 +91,7 @@ func remote_deployOTBRAgent(t *testing.T) {
 
 	commands := []string{
 		"sudo snap remove --purge openthread-border-router",
-		"sudo snap install openthread-border-router --edge",
+		"sudo snap install openthread-border-router --beta",
 		fmt.Sprintf("sudo snap set openthread-border-router %s='%s'", infraInterfaceKey, remoteInfraInterface),
 		fmt.Sprintf("sudo snap set openthread-border-router %s='%s'", radioUrlKey, remoteRadioUrl),
 		// "sudo snap connect openthread-border-router:avahi-control",
