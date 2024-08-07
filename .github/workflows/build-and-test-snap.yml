@@ -68,7 +68,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: logs
-          path: tests/*.log
+          path: tests/logs/*.log
 
   publish-amd64:
     # Only publish if we are on the main branch
