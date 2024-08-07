@@ -22,7 +22,7 @@ func TestAllClustersAppWiFi(t *testing.T) {
 	})
 
 	// Install all clusters app
-	utils.SnapInstallFromStore(t, allClustersSnap, "latest/edge")
+	utils.SnapInstallFromStore(t, allClustersSnap, "latest/beta")
 
 	// Setup all clusters app
 	utils.SnapSet(t, allClustersSnap, "args", "--wifi")

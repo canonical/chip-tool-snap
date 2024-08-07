@@ -34,7 +34,7 @@ func TestUpgrade(t *testing.T) {
 	utils.SnapConnect(t, chipToolSnap+":process-control", "")
 
 	// Install all clusters app
-	utils.SnapInstallFromStore(t, allClustersSnap, env.SnapChannel())
+	utils.SnapInstallFromStore(t, allClustersSnap, "latest/beta")
 
 	// Setup all clusters app
 	utils.SnapSet(t, allClustersSnap, "args", "--wifi")
