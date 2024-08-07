@@ -91,7 +91,7 @@ func remote_deployOTBRAgent(t *testing.T) {
 
 	commands := []string{
 		"sudo snap remove --purge openthread-border-router",
-		"sudo snap install openthread-border-router --edge",
+		"sudo snap install openthread-border-router --channel=latest/beta",
 		fmt.Sprintf("sudo snap set openthread-border-router %s='%s'", infraInterfaceKey, remoteInfraInterface),
 		fmt.Sprintf("sudo snap set openthread-border-router %s='%s'", radioUrlKey, remoteRadioUrl),
 		// "sudo snap connect openthread-border-router:avahi-control",
@@ -121,7 +121,7 @@ func remote_deployAllClustersApp(t *testing.T) {
 	commands := []string{
 		// "sudo apt install -y bluez",
 		"sudo snap remove --purge matter-all-clusters-app",
-		"sudo snap install matter-all-clusters-app --edge",
+		"sudo snap install matter-all-clusters-app --channel=latest/beta",
 		"sudo snap set matter-all-clusters-app args='--thread'",
 		"sudo snap connect matter-all-clusters-app:avahi-control",
 		// "sudo snap connect matter-all-clusters-app:bluez",

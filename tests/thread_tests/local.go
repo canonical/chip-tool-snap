@@ -9,7 +9,6 @@ import (
 
 	tests "chip-tool-snap-tests"
 
-	"github.com/canonical/matter-snap-testing/env"
 	"github.com/canonical/matter-snap-testing/utils"
 )
 
@@ -20,7 +19,7 @@ func setup(t *testing.T) {
 	utils.SnapRemove(t, otbrSnap)
 
 	// Install OTBR
-	utils.SnapInstallFromStore(t, otbrSnap, env.SnapChannel())
+	utils.SnapInstallFromStore(t, otbrSnap, "latest/beta")
 	t.Cleanup(func() {
 		utils.SnapRemove(t, otbrSnap)
 	})
