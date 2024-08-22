@@ -1,4 +1,5 @@
 # Chip Tool Snap
+
 [![chip-tool](https://snapcraft.io/chip-tool/badge.svg)](https://snapcraft.io/chip-tool)
 
 Chip Tool is a Matter controller being developed as part of the [Connected Home IP project](https://github.com/project-chip/connectedhomeip.git).
@@ -14,11 +15,13 @@ Usage instructions can be found in the [documentation](https://canonical-matter.
 ### Build the snap
 
 Build locally for the same architecture as the host:
+
 ```bash
 snapcraft -v
 ```
 
 Build remotely for all supported architectures:
+
 ```bash
 snapcraft remote-build
 ```
@@ -26,6 +29,7 @@ snapcraft remote-build
 ### Install the built snap
 
 Install the local snap:
+
 ```bash
 sudo snap install --dangerous *.snap
 ```
@@ -44,9 +48,12 @@ sudo snap connect chip-tool:process-control
 
 ### Note on sudo
 
-The latest version of the chip-tool snap does not require the use of sudo (root access). If you have updated the snap from a previous version it will still work with sudo. If you run it as a normal user, the previous state of provisioned devices will not be available.
+The latest version of the chip-tool snap does not require the use of sudo (root access).
+If you have updated the snap from a previous version it will still work with sudo.
+If you run it as a normal user, the previous state of provisioned devices will not be available.
 
-To change from running with sudo to running without sudo, you need to copy the database files from the root user to your user, and update the file ownerships. This can be done with these two commands:
+To change from running with sudo to running without sudo, you need to copy the database files from the root user to your user, and update the file ownerships.
+This can be done with these two commands:
 
 ```
 sudo cp /var/snap/chip-tool/common/mnt/chip_tool_* ~/snap/chip-tool/common/
