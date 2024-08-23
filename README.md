@@ -37,7 +37,7 @@ sudo snap install --dangerous *.snap
 ### Connect interfaces
 
 When the snap is installed from the Snap Store, the `avahi-observer` and `bluez` interfaces are connected automatically.
-If you install the snap from a local file, like when you built it yourself, you need to connect these interfaces manually:
+If you install the locally built snap, you need to connect these interfaces manually:
 
 ```bash
 sudo snap connect chip-tool:avahi-observe
