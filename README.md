@@ -34,6 +34,26 @@ Install the local snap:
 sudo snap install --dangerous *.snap
 ```
 
+### Connect interfaces
+
+When the snap is installed from the Snap Store, the `avahi-observer` and `bluez` interfaces are connected automatically.
+If you install the snap from a local file, like when you built it yourself, you need to connect these interfaces manually:
+
+```bash
+sudo snap connect chip-tool:avahi-observe
+sudo snap connect chip-tool:bluez
+```
+
+On **Ubuntu Core**, the `avahi-observe` and `bluez` interfaces are not provided by the system.
+These interfaces are provided by the [Avahi](https://snapcraft.io/avahi) and [BlueZ](https://snapcraft.io/bluez) snaps.
+To install the snaps and connect the interfaces, run:
+
+```bash
+sudo snap install avahi bluez
+sudo snap connect chip-tool:avahi-observe avahi:avahi-observe
+sudo snap connect chip-tool:bluez bluez:service
+```
+
 ## Notes
 
 ### Process Control permission
