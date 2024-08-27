@@ -13,6 +13,7 @@ const allClustersSnap = "matter-all-clusters-app"
 const chipToolSnap = "chip-tool"
 
 func InstallChipTool(t *testing.T) {
+	start := time.Now()
 
 	// clean
 	utils.SnapRemove(t, chipToolSnap)
@@ -28,6 +29,8 @@ func InstallChipTool(t *testing.T) {
 	}
 	t.Cleanup(func() {
 		utils.SnapRemove(t, chipToolSnap)
+		logs := utils.SnapLogs(t, start, chipToolSnap)
+		utils.WriteLogFile(t, chipToolSnap, logs)
 	})
 
 	// connect interfaces
