@@ -87,7 +87,7 @@ func remote_deployOTBRAgent(t *testing.T) {
 
 	t.Cleanup(func() {
 		remote_exec(t, "sudo snap remove --purge openthread-border-router")
-		remoteDumpLogs(t, "openthread-border-router", start)
+		dumpRemoteLogs(t, "openthread-border-router", start)
 	})
 
 	commands := []string{
@@ -116,7 +116,7 @@ func remote_deployAllClustersApp(t *testing.T) {
 
 	t.Cleanup(func() {
 		remote_exec(t, "sudo snap remove --purge matter-all-clusters-app")
-		remoteDumpLogs(t, "matter-all-clusters-app", start)
+		dumpRemoteLogs(t, "matter-all-clusters-app", start)
 	})
 
 	commands := []string{
@@ -193,7 +193,7 @@ func remote_waitForLogMessage(t *testing.T, snap string, expectedLog string, sta
 	t.FailNow()
 }
 
-func remoteDumpLogs(t *testing.T, label string, start time.Time) error {
+func dumpRemoteLogs(t *testing.T, label string, start time.Time) error {
 	command := fmt.Sprintf("sudo journalctl --utc --since \"%s\" --no-pager | grep \"%s\"|| true", start.UTC().Format("2006-01-02 15:04:05"), label)
 	logs := remote_exec(t, command)
 	return utils.WriteLogFile(t, "remote-"+label, logs)
