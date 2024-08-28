@@ -17,8 +17,8 @@ func TestAllClustersAppWiFi(t *testing.T) {
 	utils.SnapRemove(t, allClustersSnap)
 
 	t.Cleanup(func() {
-		utils.SnapRemove(t, allClustersSnap)
 		utils.SnapDumpLogs(t, start, allClustersSnap)
+		utils.SnapRemove(t, allClustersSnap)
 	})
 
 	// Install all clusters app

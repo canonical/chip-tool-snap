@@ -21,9 +21,9 @@ func setup(t *testing.T) {
 	otbrInstallTime := time.Now()
 	utils.SnapInstallFromStore(t, otbrSnap, "latest/beta")
 	t.Cleanup(func() {
-		utils.SnapRemove(t, otbrSnap)
 		logs := utils.SnapLogs(t, otbrInstallTime, otbrSnap)
 		utils.WriteLogFile(t, otbrSnap, logs)
+		utils.SnapRemove(t, otbrSnap)
 	})
 
 	// Connect interfaces

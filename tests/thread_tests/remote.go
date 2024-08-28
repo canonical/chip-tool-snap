@@ -86,8 +86,8 @@ func remote_deployOTBRAgent(t *testing.T) {
 	start := time.Now().UTC()
 
 	t.Cleanup(func() {
-		remote_exec(t, "sudo snap remove --purge openthread-border-router")
 		dumpRemoteLogs(t, "openthread-border-router", start)
+		remote_exec(t, "sudo snap remove --purge openthread-border-router")
 	})
 
 	commands := []string{
@@ -115,8 +115,8 @@ func remote_deployAllClustersApp(t *testing.T) {
 	start := time.Now().UTC()
 
 	t.Cleanup(func() {
-		remote_exec(t, "sudo snap remove --purge matter-all-clusters-app")
 		dumpRemoteLogs(t, "matter-all-clusters-app", start)
+		remote_exec(t, "sudo snap remove --purge matter-all-clusters-app")
 	})
 
 	commands := []string{
