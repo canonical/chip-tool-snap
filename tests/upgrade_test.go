@@ -14,11 +14,12 @@ func TestUpgrade(t *testing.T) {
 	start := time.Now()
 
 	t.Cleanup(func() {
+		utils.SnapDumpLogs(t, start, allClustersSnap)
+		utils.SnapDumpLogs(t, start, chipToolSnap)
+
 		// Remove snaps, ignoring errors during removal
 		utils.SnapRemove(nil, allClustersSnap)
 		utils.SnapRemove(nil, chipToolSnap)
-
-		utils.SnapDumpLogs(t, start, allClustersSnap)
 	})
 
 	// Start clean
