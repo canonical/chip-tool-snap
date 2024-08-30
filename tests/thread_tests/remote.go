@@ -142,6 +142,12 @@ func remote_exec(t *testing.T, command string) string {
 
 	t.Logf("[exec-ssh] %s", command)
 
+	// Remote commands that require sudo might ask for the password. Always pass it in. See https://stackoverflow.com/a/11955358
+	if strings.HasPrefix(command, "sudo ") {
+		command = command[5:] // remove "sudo "
+		command = "echo \"" + remotePassword + "\" | sudo -S " + command
+	}
+
 	if SSHClient == nil {
 		t.Fatalf("SSH client not initialized. Please connect to remote device first")
 	}
