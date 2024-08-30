@@ -91,7 +91,7 @@ jobs:
   build-arm64:
     outputs:
       snap: ${{ steps.snapcraft.outputs.snap }}
-    runs-on: Ubuntu_ARM64_4C_16G_01
+    runs-on: [self-hosted, ARM64, Linux]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
