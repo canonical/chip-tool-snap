@@ -89,8 +89,6 @@ jobs:
           release: latest/edge
 
   build-arm64:
-    # We do not start the long running arm64 build unless the amd64 tests have passed.
-    needs: test-amd64
     outputs:
       snap: ${{ steps.snapcraft.outputs.snap }}
     runs-on: Ubuntu_ARM64_4C_16G_01
@@ -112,7 +110,8 @@ jobs:
   publish-arm64:
     # Only publish if we are on the main branch
     if: github.ref == 'refs/heads/main'
-    needs: [build-arm64]
+    # For now depend on the amd64 tests to gate arm64 publishing
+    needs: [build-arm64, test-amd64]
     runs-on: ubuntu-latest
     steps:
       - name: Download locally built snap
