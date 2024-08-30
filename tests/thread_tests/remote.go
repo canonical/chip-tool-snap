@@ -144,9 +144,9 @@ func remote_exec(t *testing.T, command string) string {
 
 	// Remote commands that require sudo might ask for the password. Always pass it in. See https://stackoverflow.com/a/11955358
 	if strings.HasPrefix(command, "sudo ") {
-		command = command[5:]
+		command = strings.TrimPrefix(command, "sudo ")
 		escapedPassword := strings.Replace(remotePassword, "\"", "\\\"", -1)
-		command = "echo \"" + escapedPassword + "\" | sudo -S " + command
+		command = fmt.Sprintf(`echo "%s" | sudo -S %s`, escapedPassword, command)
 	}
 
 	if SSHClient == nil {
