@@ -1,4 +1,4 @@
-name: Build, test and publish snap
+name: Snap CI AMD64
 
 on:
   schedule:
