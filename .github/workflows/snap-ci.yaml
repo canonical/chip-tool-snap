@@ -3,50 +3,84 @@ name: Snap CI
 on:
   # schedule:
   #   - cron: "20 2 * * 1" # Monday morning 02:20 UTC
-  push:
+#   push:
   #   branches: [main]
-  pull_request:
+#   pull_request:
   #   branches: [main]
   # Allow manual trigger
   workflow_dispatch:
-
-env:
-  ARTIFACT_AMD64: chip-tool_${{ github.run_number}}_amd64
-  ARTIFACT_ARM64: chip-tool_${{ github.run_number}}_arm64
 
 jobs:
   matrix-build:
     strategy:
       matrix:
-        runner: ["ubuntu-latest", [self-hosted, ARM64, Linux]]
-    runs-on: ${{ matrix.runner }}
-
-    # outputs:
-    #   snap: ${{ steps.snapcraft.outputs.snap }}
+        runs:
+          - architecture: amd64
+            runner: ubuntu-latest
+          - architecture: arm64
+            runner: [self-hosted, ARM64, Linux]
+    runs-on: ${{ matrix.runs.runner }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Debug print
+      - name: Build snap
+        uses: snapcore/action-build@v1
+        id: snapcraft
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chip-tool_${{ github.run_number}}_${{matrix.runs.architecture}}
+          path: ${{ steps.snapcraft.outputs.snap }}
+          if-no-files-found: error
+
+      - uses: snapcore/action-publish@v1
+        # if: github.ref == 'refs/heads/main'
         env:
-          RUNNER_CONTEXT: ${{ toJson(runner) }}
-        run: echo "$RUNNER_CONTEXT"
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+        with:
+          snap: ${{ steps.snapcraft.outputs.snap }}
+          release: latest/edge/test
 
-    #   - name: Build snap
-    #     uses: snapcore/action-build@v1
-    #     id: snapcraft
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.*"
+          cache: false
 
-    #   - name: Upload artifact
-    #     uses: actions/upload-artifact@v4
-    #     with:
-    #         name: ${{ env.ARTIFACT_AMD64 }}
-    #         path: ${{ steps.snapcraft.outputs.snap }}
-    #         if-no-files-found: error
+      - name: Run tests
+        shell: bash
+        working-directory: tests
+        env:
+          SKIP_TEARDOWN_REMOVAL: true
+          LOCAL_SERVICE_SNAP: ../${{ steps.snapcraft.outputs.snap }}
+        run: |
+          go test -failfast -p 1 -timeout 30m -v
 
-  promote:
-    needs: [matrix-build]
+      - name: Upload snap logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs
+          path: tests/logs/*.log
+
+  promote-beta:
+    # Only promote if we are on the main branch
+    # if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    needs: [matrix-build]
     steps:
-      - name: Promote
-        run: echo "Promoting"
+      - name: Install Snapcraft
+        run: |
+          sudo snap install snapcraft --classic
+          echo /snap/bin >> $GITHUB_PATH
+        shell: bash
+
+      - name: Promote Snap
+        env: # Workaround for https://github.com/snapcore/snapcraft/issues/4439
+          SNAPCRAFT_HAS_TTY: "true"
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+        run: |
+          yes | snapcraft promote chip-tool --from-channel latest/edge/test --to-channel latest/beta/test
