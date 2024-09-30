@@ -10,6 +10,9 @@ on:
   # Allow manual trigger
   workflow_dispatch:
 
+env:
+  SNAP_NAME: chip-tool
+
 jobs:
   matrix-build:
     strategy:
@@ -32,7 +35,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: chip-tool_${{ github.run_number}}_${{matrix.runs.architecture}}
+          name: ${{env.SNAP_NAME}}_${{github.run_number}}_${{matrix.runs.architecture}}
           path: ${{ steps.snapcraft.outputs.snap }}
           if-no-files-found: error
 
@@ -83,4 +86,4 @@ jobs:
           SNAPCRAFT_HAS_TTY: "true"
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
         run: |
-          yes | snapcraft promote chip-tool --from-channel latest/edge --to-channel latest/beta
+          yes | snapcraft promote $SNAP_NAME --from-channel latest/edge --to-channel latest/beta
