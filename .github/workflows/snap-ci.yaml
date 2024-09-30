@@ -1,12 +1,12 @@
 name: Snap CI
 
 on:
-  # schedule:
-  #   - cron: "20 2 * * 1" # Monday morning 02:20 UTC
+  schedule:
+    - cron: "20 2 * * 1" # Monday mornings 02:20 UTC
   push:
-  #   branches: [main]
+    branches: [main]
   pull_request:
-  #   branches: [main]
+    branches: [main]
   # Allow manual trigger
   workflow_dispatch:
 
@@ -37,12 +37,12 @@ jobs:
           if-no-files-found: error
 
       - uses: snapcore/action-publish@v1
-        # if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
         with:
           snap: ${{ steps.snapcraft.outputs.snap }}
-          release: latest/edge/test
+          release: latest/edge
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -63,12 +63,12 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs_${{matrix.runs.architecture}}
+          name: logs_${{ github.run_number}}_${{matrix.runs.architecture}}
           path: tests/logs/*.log
 
   promote-beta:
     # Only promote if we are on the main branch
-    # if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: [matrix-build]
     steps:
@@ -83,4 +83,4 @@ jobs:
           SNAPCRAFT_HAS_TTY: "true"
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
         run: |
-          yes | snapcraft promote chip-tool --from-channel latest/edge/test --to-channel latest/beta/test
+          yes | snapcraft promote chip-tool --from-channel latest/edge --to-channel latest/beta
