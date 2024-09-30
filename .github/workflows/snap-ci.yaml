@@ -63,7 +63,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs_${{matrix.runs.architecture}}
           path: tests/logs/*.log
 
   promote-beta:
