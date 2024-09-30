@@ -3,9 +3,9 @@ name: Snap CI
 on:
   # schedule:
   #   - cron: "20 2 * * 1" # Monday morning 02:20 UTC
-#   push:
+  push:
   #   branches: [main]
-#   pull_request:
+  pull_request:
   #   branches: [main]
   # Allow manual trigger
   workflow_dispatch:
