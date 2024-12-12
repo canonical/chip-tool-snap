@@ -24,7 +24,7 @@ parts:
     plugin: nil
     build-environment:
       - BUILD_METADATA: snap
-      - CHIP_TAG: master
+      - CHIP_TAG: v1.4.0.0
     override-pull: |
       # shallow clone the project and its submodules
       git clone https://github.com/project-chip/connectedhomeip.git --depth=1 --branch=$CHIP_TAG .
