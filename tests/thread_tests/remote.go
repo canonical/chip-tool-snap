@@ -12,6 +12,12 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+const (
+	// Adding a 120 seconds offset to account for any clock skew
+	// between the local and remote machine.
+	ClockOffset = 120 // seconds
+)
+
 var (
 	remoteUser           = ""
 	remotePassword       = ""
@@ -33,7 +39,6 @@ func remote_setup(t *testing.T) {
 }
 
 func remote_loadEnvVars() {
-
 	if v := os.Getenv(remoteUserEnv); v != "" {
 		remoteUser = v
 	}
@@ -83,7 +88,7 @@ func connectSSH(t *testing.T) {
 }
 
 func remote_deployOTBRAgent(t *testing.T) {
-	start := time.Now().UTC()
+	start := time.Now()
 
 	t.Cleanup(func() {
 		dumpRemoteLogs(t, "openthread-border-router", start)
@@ -112,7 +117,7 @@ func remote_deployOTBRAgent(t *testing.T) {
 }
 
 func remote_deployAllClustersApp(t *testing.T) {
-	start := time.Now().UTC()
+	start := time.Now()
 
 	t.Cleanup(func() {
 		dumpRemoteLogs(t, "matter-all-clusters-app", start)
@@ -187,7 +192,9 @@ func remote_waitForLogMessage(t *testing.T, snap string, expectedLog string, sta
 		time.Sleep(1 * time.Second)
 		t.Logf("Retry %d/%d: Waiting for expected content in logs: '%s'", i, maxRetry, expectedLog)
 
-		command := fmt.Sprintf("sudo journalctl --utc --since \"%s\" --no-pager | grep \"%s\"|| true", start.UTC().Format("2006-01-02 15:04:05"), snap)
+		// Use Unix timestamp which is timezone-independent
+		// journalctl accepts timestamps in the format @UNIX_TIMESTAMP
+		command := fmt.Sprintf("sudo journalctl --since \"@%d\" --no-pager | grep \"%s\" || true", start.Unix()-ClockOffset, snap)
 		logs := remote_exec(t, command)
 		if strings.Contains(logs, expectedLog) {
 			t.Logf("Found expected content in logs: '%s'", expectedLog)
@@ -201,7 +208,7 @@ func remote_waitForLogMessage(t *testing.T, snap string, expectedLog string, sta
 }
 
 func dumpRemoteLogs(t *testing.T, label string, start time.Time) error {
-	command := fmt.Sprintf("sudo journalctl --utc --since \"%s\" --no-pager | grep \"%s\"|| true", start.UTC().Format("2006-01-02 15:04:05"), label)
+	command := fmt.Sprintf("sudo journalctl --since \"@%d\" --no-pager | grep \"%s\" || true", start.Unix()-ClockOffset, label)
 	logs := remote_exec(t, command)
 	return utils.WriteLogFile(t, "remote-"+label, logs)
 }
