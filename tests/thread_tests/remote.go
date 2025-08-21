@@ -82,7 +82,7 @@ func connectSSH(t *testing.T) {
 	t.Logf("SSH: connected to %s", remoteHost)
 }
 
-func getStartTimestamp(t *testing.T) time.Time {
+func getRemoteStartTime(t *testing.T) time.Time {
 	t.Helper()
 	// Get the current unix timestamp on the remote device
 	start := remote_exec(t, "date +%s")
@@ -96,7 +96,7 @@ func getStartTimestamp(t *testing.T) time.Time {
 }
 
 func remote_deployOTBRAgent(t *testing.T) {
-	start := getStartTimestamp(t)
+	start := getRemoteStartTime(t)
 
 	t.Cleanup(func() {
 		dumpRemoteLogs(t, "openthread-border-router", start)
@@ -125,7 +125,7 @@ func remote_deployOTBRAgent(t *testing.T) {
 }
 
 func remote_deployAllClustersApp(t *testing.T) {
-	start := getStartTimestamp(t)
+	start := getRemoteStartTime(t)
 
 	t.Cleanup(func() {
 		dumpRemoteLogs(t, "matter-all-clusters-app", start)
