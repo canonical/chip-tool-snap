@@ -200,9 +200,7 @@ func remote_waitForLogMessage(t *testing.T, snap string, expectedLog string, sta
 		time.Sleep(1 * time.Second)
 		t.Logf("Retry %d/%d: Waiting for expected content in logs: '%s'", i, maxRetry, expectedLog)
 
-		// Use Unix timestamp which is timezone-independent
-		// journalctl accepts timestamps in the format @UNIX_TIMESTAMP
-		command := fmt.Sprintf("sudo journalctl --since @%d --no-pager | grep \"%s\" || true", start.Unix(), snap)
+		command := fmt.Sprintf("sudo journalctl --since %q --no-pager | grep \"%s\" || true", start.Format(time.RFC3339), snap)
 		logs := remote_exec(t, command)
 		if strings.Contains(logs, expectedLog) {
 			t.Logf("Found expected content in logs: '%s'", expectedLog)
@@ -216,7 +214,7 @@ func remote_waitForLogMessage(t *testing.T, snap string, expectedLog string, sta
 }
 
 func dumpRemoteLogs(t *testing.T, label string, start time.Time) error {
-	command := fmt.Sprintf("sudo journalctl --since @%d --no-pager | grep \"%s\" || true", start.Unix(), label)
+	command := fmt.Sprintf("sudo journalctl --since %q --no-pager | grep \"%s\" || true", start.Format(time.RFC3339), label)
 	logs := remote_exec(t, command)
 	return utils.WriteLogFile(t, "remote-"+label, logs)
 }
