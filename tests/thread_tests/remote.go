@@ -4,18 +4,13 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/canonical/matter-snap-testing/utils"
 	"golang.org/x/crypto/ssh"
-)
-
-const (
-	// Adding a 120 seconds offset to account for any clock skew
-	// between the local and remote machine.
-	ClockOffset = 120 // seconds
 )
 
 var (
@@ -87,8 +82,21 @@ func connectSSH(t *testing.T) {
 	t.Logf("SSH: connected to %s", remoteHost)
 }
 
+func getStartTimestamp(t *testing.T) int64 {
+	t.Helper()
+	// Get the current unix timestamp on the remote device
+	start := remote_exec(t, "date +%s")
+	start = strings.TrimSpace(start)
+	start = strings.TrimSuffix(start, "\n")
+	startTimestamp, err := strconv.ParseInt(start, 10, 64)
+	if err != nil {
+		t.Fatalf("Failed to parse start timestamp: %v", err)
+	}
+	return startTimestamp
+}
+
 func remote_deployOTBRAgent(t *testing.T) {
-	start := time.Now()
+	start := getStartTimestamp(t)
 
 	t.Cleanup(func() {
 		dumpRemoteLogs(t, "openthread-border-router", start)
@@ -117,7 +125,7 @@ func remote_deployOTBRAgent(t *testing.T) {
 }
 
 func remote_deployAllClustersApp(t *testing.T) {
-	start := time.Now()
+	start := getStartTimestamp(t)
 
 	t.Cleanup(func() {
 		dumpRemoteLogs(t, "matter-all-clusters-app", start)
@@ -184,7 +192,7 @@ func remote_exec(t *testing.T, command string) string {
 	return string(output)
 }
 
-func remote_waitForLogMessage(t *testing.T, snap string, expectedLog string, start time.Time) {
+func remote_waitForLogMessage(t *testing.T, snap string, expectedLog string, startTimestamp int64) {
 	t.Helper()
 
 	const maxRetry = 10
@@ -194,7 +202,7 @@ func remote_waitForLogMessage(t *testing.T, snap string, expectedLog string, sta
 
 		// Use Unix timestamp which is timezone-independent
 		// journalctl accepts timestamps in the format @UNIX_TIMESTAMP
-		command := fmt.Sprintf("sudo journalctl --since \"@%d\" --no-pager | grep \"%s\" || true", start.Unix()-ClockOffset, snap)
+		command := fmt.Sprintf("sudo journalctl --since \"@%d\" --no-pager | grep \"%s\" || true", startTimestamp, snap)
 		logs := remote_exec(t, command)
 		if strings.Contains(logs, expectedLog) {
 			t.Logf("Found expected content in logs: '%s'", expectedLog)
@@ -207,8 +215,8 @@ func remote_waitForLogMessage(t *testing.T, snap string, expectedLog string, sta
 	t.FailNow()
 }
 
-func dumpRemoteLogs(t *testing.T, label string, start time.Time) error {
-	command := fmt.Sprintf("sudo journalctl --since \"@%d\" --no-pager | grep \"%s\" || true", start.Unix()-ClockOffset, label)
+func dumpRemoteLogs(t *testing.T, label string, startTimestamp int64) error {
+	command := fmt.Sprintf("sudo journalctl --since \"@%d\" --no-pager | grep \"%s\" || true", startTimestamp, label)
 	logs := remote_exec(t, command)
 	return utils.WriteLogFile(t, "remote-"+label, logs)
 }
