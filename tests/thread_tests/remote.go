@@ -202,7 +202,7 @@ func remote_waitForLogMessage(t *testing.T, snap string, expectedLog string, sta
 
 		// Use Unix timestamp which is timezone-independent
 		// journalctl accepts timestamps in the format @UNIX_TIMESTAMP
-		command := fmt.Sprintf("sudo journalctl --since @%d --no-pager | grep \"%s\" || true", start, snap)
+		command := fmt.Sprintf("sudo journalctl --since @%d --no-pager | grep \"%s\" || true", start.Unix(), snap)
 		logs := remote_exec(t, command)
 		if strings.Contains(logs, expectedLog) {
 			t.Logf("Found expected content in logs: '%s'", expectedLog)
