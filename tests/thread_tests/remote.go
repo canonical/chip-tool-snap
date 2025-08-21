@@ -82,7 +82,7 @@ func connectSSH(t *testing.T) {
 	t.Logf("SSH: connected to %s", remoteHost)
 }
 
-func getStartTimestamp(t *testing.T) int64 {
+func getStartTimestamp(t *testing.T) time.Time {
 	t.Helper()
 	// Get the current unix timestamp on the remote device
 	start := remote_exec(t, "date +%s")
@@ -92,7 +92,7 @@ func getStartTimestamp(t *testing.T) int64 {
 	if err != nil {
 		t.Fatalf("Failed to parse start timestamp: %v", err)
 	}
-	return startTimestamp
+	return time.Unix(startTimestamp, 0)
 }
 
 func remote_deployOTBRAgent(t *testing.T) {
@@ -192,7 +192,7 @@ func remote_exec(t *testing.T, command string) string {
 	return string(output)
 }
 
-func remote_waitForLogMessage(t *testing.T, snap string, expectedLog string, startTimestamp int64) {
+func remote_waitForLogMessage(t *testing.T, snap string, expectedLog string, start time.Time) {
 	t.Helper()
 
 	const maxRetry = 10
@@ -202,7 +202,7 @@ func remote_waitForLogMessage(t *testing.T, snap string, expectedLog string, sta
 
 		// Use Unix timestamp which is timezone-independent
 		// journalctl accepts timestamps in the format @UNIX_TIMESTAMP
-		command := fmt.Sprintf("sudo journalctl --since \"@%d\" --no-pager | grep \"%s\" || true", startTimestamp, snap)
+		command := fmt.Sprintf("sudo journalctl --since @%d --no-pager | grep \"%s\" || true", start, snap)
 		logs := remote_exec(t, command)
 		if strings.Contains(logs, expectedLog) {
 			t.Logf("Found expected content in logs: '%s'", expectedLog)
@@ -215,8 +215,8 @@ func remote_waitForLogMessage(t *testing.T, snap string, expectedLog string, sta
 	t.FailNow()
 }
 
-func dumpRemoteLogs(t *testing.T, label string, startTimestamp int64) error {
-	command := fmt.Sprintf("sudo journalctl --since \"@%d\" --no-pager | grep \"%s\" || true", startTimestamp, label)
+func dumpRemoteLogs(t *testing.T, label string, start time.Time) error {
+	command := fmt.Sprintf("sudo journalctl --since @%d --no-pager | grep \"%s\" || true", start.Unix(), label)
 	logs := remote_exec(t, command)
 	return utils.WriteLogFile(t, "remote-"+label, logs)
 }
