@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -33,7 +34,6 @@ func remote_setup(t *testing.T) {
 }
 
 func remote_loadEnvVars() {
-
 	if v := os.Getenv(remoteUserEnv); v != "" {
 		remoteUser = v
 	}
@@ -82,8 +82,20 @@ func connectSSH(t *testing.T) {
 	t.Logf("SSH: connected to %s", remoteHost)
 }
 
+func getRemoteStartTime(t *testing.T) time.Time {
+	t.Helper()
+	// Get the current unix timestamp on the remote device
+	start := remote_exec(t, "date +%s")
+	start = strings.TrimSpace(start)
+	startTimestamp, err := strconv.ParseInt(start, 10, 64)
+	if err != nil {
+		t.Fatalf("Failed to parse start timestamp: %v", err)
+	}
+	return time.Unix(startTimestamp, 0)
+}
+
 func remote_deployOTBRAgent(t *testing.T) {
-	start := time.Now().UTC()
+	start := getRemoteStartTime(t)
 
 	t.Cleanup(func() {
 		dumpRemoteLogs(t, "openthread-border-router", start)
@@ -112,7 +124,7 @@ func remote_deployOTBRAgent(t *testing.T) {
 }
 
 func remote_deployAllClustersApp(t *testing.T) {
-	start := time.Now().UTC()
+	start := getRemoteStartTime(t)
 
 	t.Cleanup(func() {
 		dumpRemoteLogs(t, "matter-all-clusters-app", start)
@@ -187,7 +199,7 @@ func remote_waitForLogMessage(t *testing.T, snap string, expectedLog string, sta
 		time.Sleep(1 * time.Second)
 		t.Logf("Retry %d/%d: Waiting for expected content in logs: '%s'", i, maxRetry, expectedLog)
 
-		command := fmt.Sprintf("sudo journalctl --utc --since \"%s\" --no-pager | grep \"%s\"|| true", start.UTC().Format("2006-01-02 15:04:05"), snap)
+		command := fmt.Sprintf("sudo journalctl --since %q --no-pager | grep \"%s\" || true", start.Format(time.RFC3339), snap)
 		logs := remote_exec(t, command)
 		if strings.Contains(logs, expectedLog) {
 			t.Logf("Found expected content in logs: '%s'", expectedLog)
@@ -201,7 +213,7 @@ func remote_waitForLogMessage(t *testing.T, snap string, expectedLog string, sta
 }
 
 func dumpRemoteLogs(t *testing.T, label string, start time.Time) error {
-	command := fmt.Sprintf("sudo journalctl --utc --since \"%s\" --no-pager | grep \"%s\"|| true", start.UTC().Format("2006-01-02 15:04:05"), label)
+	command := fmt.Sprintf("sudo journalctl --since %q --no-pager | grep \"%s\" || true", start.Format(time.RFC3339), label)
 	logs := remote_exec(t, command)
 	return utils.WriteLogFile(t, "remote-"+label, logs)
 }

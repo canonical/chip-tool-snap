@@ -2,7 +2,6 @@ package thread_tests
 
 import (
 	"testing"
-	"time"
 
 	"github.com/canonical/matter-snap-testing/utils"
 	"github.com/stretchr/testify/assert"
@@ -22,7 +21,7 @@ func TestAllClustersAppThread(t *testing.T) {
 	})
 
 	t.Run("Control", func(t *testing.T) {
-		start := time.Now()
+		start := getRemoteStartTime(t)
 		stdout, _, _ := utils.Exec(t, "chip-tool onoff toggle 110 1 2>&1")
 
 		assert.NoError(t, utils.WriteLogFile(t, "chip-tool", stdout))
@@ -32,5 +31,4 @@ func TestAllClustersAppThread(t *testing.T) {
 		// https://github.com/canonical/chip-tool-snap/pull/69#issuecomment-2209530275
 		remote_waitForLogMessage(t, "matter-all-clusters-app", "ClusterId = 0x6", start)
 	})
-
 }
