@@ -87,7 +87,6 @@ func getRemoteStartTime(t *testing.T) time.Time {
 	// Get the current unix timestamp on the remote device
 	start := remote_exec(t, "date +%s")
 	start = strings.TrimSpace(start)
-	start = strings.TrimSuffix(start, "\n")
 	startTimestamp, err := strconv.ParseInt(start, 10, 64)
 	if err != nil {
 		t.Fatalf("Failed to parse start timestamp: %v", err)
