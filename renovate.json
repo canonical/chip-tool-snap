@@ -2,5 +2,80 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:base"
+  ],
+  "baseBranches": [
+    "main",
+    "/^v\\d+\\.\\d+$/"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^snap/snapcraft\\.yaml$"
+      ],
+      "matchStrings": [
+        "CHIP_TAG:\\s*(?<currentValue>v[\\d.]+)"
+      ],
+      "depNameTemplate": "project-chip/connectedhomeip",
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "loose"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "For major/minor releases on main: create a v<major>.<minor> branch and PR into main",
+      "matchPackageNames": [
+        "project-chip/connectedhomeip"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ],
+      "matchBaseBranches": [
+        "main"
+      ],
+      "branchName": "v{{newMajor}}.{{newMinor}}",
+      "targetBranch": "main"
+    },
+    {
+      "description": "Ignore major/minor releases on v<major>.<minor> branches",
+      "matchPackageNames": [
+        "project-chip/connectedhomeip"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ],
+      "matchBaseBranches": [
+        "/^v\\d+\\.\\d+$/"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "For patch releases on v<major>.<minor> branches: open PR targeting that branch",
+      "matchPackageNames": [
+        "project-chip/connectedhomeip"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "matchBaseBranches": [
+        "/^v\\d+\\.\\d+$/"
+      ],
+      "targetBranch": "v{{newMajor}}.{{newMinor}}"
+    },
+    {
+      "description": "Ignore patch releases on main (patches are tracked on v<major>.<minor> branches)",
+      "matchPackageNames": [
+        "project-chip/connectedhomeip"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "matchBaseBranches": [
+        "main"
+      ],
+      "enabled": false
+    }
   ]
 }
