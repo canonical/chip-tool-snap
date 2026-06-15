@@ -71,6 +71,8 @@ parts:
       - libreadline-dev
       - generate-ninja
       - libevent-dev
+    stage-packages:
+      - libevent-core-2.1-7t64
 
 apps:
   chip-tool:
