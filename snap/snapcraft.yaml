@@ -70,6 +70,7 @@ parts:
       - libcairo2-dev
       - libreadline-dev
       - generate-ninja
+      - libevent-dev
 
 apps:
   chip-tool:
