@@ -70,6 +70,13 @@ parts:
       - libcairo2-dev
       - libreadline-dev
       - generate-ninja
+      - libevent-dev
+
+  runtime-dependencies:
+    plugin: nil
+    stage-packages:
+      - libevent-core-2.1-7t64
+      - libevent-pthreads-2.1-7t64
 
 apps:
   chip-tool:

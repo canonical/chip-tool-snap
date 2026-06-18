@@ -1,7 +1,7 @@
 # Run Tests
 
 ```bash
-go test -v -failfast -count 1
+SNAP_PATH=/path/to/chip-tool.snap go test -v -failfast -count 1
 ```
 
 where:
@@ -24,6 +24,7 @@ For building and flashing RCP firmware, please refer
 to [Build and flash RCP firmware on nRF52480 dongle](https://github.com/canonical/openthread-border-router-snap/wiki/Setup-OpenThread-Border-Router-with-nRF52840-Dongle#build-and-flash-rcp-firmware-on-nrf52480-dongle).
 
 ```bash
+SNAP_CHANNEL="latest/candidate" \
 LOCAL_INFRA_IF="eno1" \
 REMOTE_INFRA_IF="eth0" \
 REMOTE_USER="ubuntu" \

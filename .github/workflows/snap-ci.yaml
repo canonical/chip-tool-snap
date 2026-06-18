@@ -20,9 +20,9 @@ jobs:
       matrix:
         runs:
           - architecture: amd64
-            runner: ubuntu-latest
+            runner: ubuntu-24.04
           - architecture: arm64
-            runner: [self-hosted, ARM64, Linux]
+            runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runs.runner }}
 
     steps:
