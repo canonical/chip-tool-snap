@@ -1,7 +1,7 @@
 # Run Tests
 
 ```bash
-SNAP_PATH=... go test -v -failfast -count 1
+SNAP_PATH=/path/to/chip-tool.snap go test -v -failfast -count 1
 ```
 
 where:
