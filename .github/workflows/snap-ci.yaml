@@ -85,8 +85,9 @@ jobs:
         shell: bash
 
       - name: Promote Snap
-        env: # Workaround for https://github.com/snapcore/snapcraft/issues/4439
-          SNAPCRAFT_HAS_TTY: "true"
+        env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
         run: |
-          yes | snapcraft promote $SNAP_NAME --from-channel latest/edge --to-channel latest/beta
+          snapcraft promote $SNAP_NAME --yes \
+            --from-channel "latest/edge" \
+            --to-channel   "latest/beta"
